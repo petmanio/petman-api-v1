@@ -28,9 +28,9 @@ module.exports.connections = {
   * Installed by default.                                                    *
   *                                                                          *
   ***************************************************************************/
-  localDiskDb: {
-    adapter: 'sails-disk'
-  },
+  // localDiskDb: {
+  //   adapter: 'sails-disk'
+  // },
 
   /***************************************************************************
   *                                                                          *
@@ -82,6 +82,13 @@ module.exports.connections = {
   //   database: 'YOUR_POSTGRES_DB' //optional
   // }
 
+  localPostgres: {
+    adapter: 'sails-postgresql',
+    host: 'localhost',
+    user: 'andranik',
+    password: 'andant',
+    database: 'walkypet'
+  }
 
   /***************************************************************************
   *                                                                          *
