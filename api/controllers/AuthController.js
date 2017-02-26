@@ -17,6 +17,8 @@ module.exports = {
       this.loginFb(...arguments)
     } else if (req.body.local) {
       this.loginLocal();
+    } else {
+      res.badRequest()
     }
   },
 
@@ -34,6 +36,10 @@ module.exports = {
       })
       .then(token => res.ok({ token }))
       .catch(next);
+  },
+
+  currentUser(req, res, next) {
+    res.ok(req.user);
   }
 };
 

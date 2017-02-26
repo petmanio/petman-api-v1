@@ -8,7 +8,6 @@ FB.options({
   appSecret:      config.fb.appSecret
 });
 
-
 module.exports = {
   findUserByFbId(fb_id) {
     return Auth.findOne({fb_id})
@@ -74,5 +73,20 @@ module.exports = {
         reject(err);
       }
     });
+  },
+
+  verifyUserToken(token) {
+    return new Promise((resolve, reject) => {
+      try {
+        resolve(jwt.verify(token, sails.config.session.secret))
+      } catch (err) {
+        reject(err);
+      }
+    });
+  },
+
+  getUserByToken(token) {
+    return this.verifyUserToken(token)
+      .then(({ id }) => User.findOneById(id).populate('userData'));
   }
 };
