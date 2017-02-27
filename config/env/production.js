@@ -37,7 +37,7 @@ module.exports = {
 
   models: {
     connection: 'prodPostgres',
-    migrate: 'safe'
+    // migrate: 'safe'
   },
 
   fb: {
