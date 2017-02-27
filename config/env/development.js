@@ -22,8 +22,8 @@ module.exports = {
   // }
 
   fb: {
-    appId: '1352754344791293',
-    appSecret: '2f1c93192e3ef95b50c787bc1b4ebe10',
+    appId: '782744788540027',
+    appSecret: '7d3159295adb9b081368044ca72e3af2',
     scope: 'public_profile,email'
   }
 

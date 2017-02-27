@@ -35,4 +35,15 @@ module.exports = {
   //   level: "silent"
   // }
 
+  models: {
+    connection: 'prodPostgres',
+    migrate: 'safe'
+  },
+
+  fb: {
+    appId: '1352754344791293',
+    appSecret: '2f1c93192e3ef95b50c787bc1b4ebe10',
+    scope: 'public_profile,email'
+  }
+
 };

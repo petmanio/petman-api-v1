@@ -88,6 +88,20 @@ module.exports.connections = {
     user: 'andranik',
     password: 'andant',
     database: 'walkypet'
+  },
+
+  prodPostgres: {
+    // url: 'postgres://foibrztxpbokmn:567be06af21a5a9471b1fa22890fd9fb80fc453a7b734bdb8ce5983d868cc4ff@ec2-54-75-239-190.eu-west-1.compute.amazonaws.com:5432/dfvgb5enpjlro4',
+    adapter: 'sails-postgresql',
+    host: 'ec2-54-75-239-190.eu-west-1.compute.amazonaws.com',
+    user: 'foibrztxpbokmn',
+    password: '567be06af21a5a9471b1fa22890fd9fb80fc453a7b734bdb8ce5983d868cc4ff',
+    database: 'dfvgb5enpjlro4',
+    port: 5432,
+    pool: false,
+    ssl: {
+      rejectUnauthorized: false
+    }
   }
 
   /***************************************************************************
