@@ -1,3 +1,4 @@
+const package = require('../package.json');
 /**
  * Route Mappings
  * (sails.config.routes)
@@ -32,8 +33,11 @@ module.exports.routes = {
   *                                                                          *
   ***************************************************************************/
 
-  '/': {
-    view: 'homepage'
+  '/': (req, res) => {
+    res.json({
+      name: package.name,
+      version: package.version
+    });
   },
 
   'POST /api/auth/login': 'AuthController.login',

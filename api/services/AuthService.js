@@ -21,7 +21,7 @@ module.exports = {
   getUserFbDataByAccessToken(token) {
     FB.setAccessToken(token);
     return new Promise((resolve, reject) => {
-      FB.api('me', { fields: 'email,gender,birthday,picture' }, (res) => {
+      FB.api('me', { fields: 'email,gender,birthday,first_name,last_name,picture.width(360).height(360)' }, (res) => {
         if(!res || res.error) return reject(res.error);
         resolve(res);
       });
@@ -51,6 +51,8 @@ module.exports = {
               UserData.create({
                 gender: fbUser.gender.toUpperCase(),
                 avatar: fbUser.picture.data.url,
+                firstName: fbUser.first_name,
+                lastName: fbUser.last_name,
                 user: user.id
               })
             ])

@@ -17,6 +17,14 @@ module.exports = {
     avatar: {
       type: 'string',
       defaultsTo: null
+    },
+    firstName: {
+      type: 'string',
+      defaultsTo: null
+    },
+    lastName: {
+      type: 'string',
+      defaultsTo: null
     }
   }
 };
