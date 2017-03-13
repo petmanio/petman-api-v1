@@ -6,11 +6,11 @@
  */
 
 module.exports = {
-  _config: {
-    actions: false,
-    shortcuts: false,
-    rest: true
-  },
+  // _config: {
+  //   actions: false,
+  //   shortcuts: false,
+  //   rest: true
+  // },
 
 	login(req, res, next) {
     if (req.body.fb) {
