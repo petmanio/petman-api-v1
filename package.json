@@ -1,5 +1,5 @@
 {
-  "name": "walkypet-api",
+  "name": "petman-api",
   "private": true,
   "version": "0.1.8",
   "description": "a Sails application",
@@ -24,7 +24,7 @@
   "main": "app.js",
   "repository": {
     "type": "git",
-    "url": "git://github.com/andranik/walkypet-api.git"
+    "url": "git://github.com/andranik/petman-api.git"
   },
   "author": "andranik",
   "license": ""
