@@ -43,7 +43,9 @@ module.exports.routes = {
   'POST /api/auth/login': 'AuthController.login',
   'GET /api/auth/current-user': 'AuthController.currentUser',
 
-  'GET /api/blog/list': 'BlogController.list'
+  'GET /api/blog/list': 'BlogController.list',
+
+  'GET /api/shop/list': 'ShopController.list'
 
   /***************************************************************************
   *                                                                          *
