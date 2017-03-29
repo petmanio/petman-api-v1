@@ -28,10 +28,6 @@ module.exports = {
     thumbnail: {
       type: 'string',
       defaultsTo: null
-    },
-    lang: {
-      type: 'string',
-      defaultsTo: 'en'
     }
   }
 };

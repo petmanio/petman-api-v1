@@ -17,5 +17,9 @@ module.exports = {
         }
       });
 
+  },
+
+  getPins() {
+    return Shop.find();
   }
 };

@@ -7,6 +7,10 @@
 
 module.exports = {
   attributes: {
+    name: {
+      type: 'string',
+      defaultsTo: null
+    },
     description: {
       type: 'string',
       defaultsTo: null
@@ -26,10 +30,6 @@ module.exports = {
     lng: {
       type: 'float',
       defaultsTo: null
-    },
-    lang: {
-      type: 'string',
-      defaultsTo: 'en'
     }
   }
 };

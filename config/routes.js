@@ -45,7 +45,8 @@ module.exports.routes = {
 
   'GET /api/blog/list': 'BlogController.list',
 
-  'GET /api/shop/list': 'ShopController.list'
+  'GET /api/shop/list': 'ShopController.list',
+  'GET /api/shop/pins': 'ShopController.pins'
 
   /***************************************************************************
   *                                                                          *
