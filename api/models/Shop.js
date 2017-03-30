@@ -26,6 +26,10 @@ module.exports = {
     lat: {
       type: 'float',
       defaultsTo: null
+    },
+    lng: {
+      type: 'float',
+      defaultsTo: null
     }
   }
 };
