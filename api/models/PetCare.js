@@ -41,7 +41,7 @@ module.exports = {
   getList(skip = 0, limit = 10, type) {
     let petCareCount;
     let findQuery = type ? {type} : {};
-    return PetCare.count({type})
+    return PetCare.count(findQuery)
       .then(count => {
         petCareCount = count;
         return PetCare.find(findQuery).skip(skip).limit(limit);
