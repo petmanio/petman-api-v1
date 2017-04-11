@@ -11,10 +11,9 @@ module.exports = {
       type: 'string',
       defaultsTo: null
     },
-    petCare: {
+    owners: {
       collection: 'PetCare',
-      via: 'categories',
-      dominant: true
+      via: 'categories'
     }
   }
 };

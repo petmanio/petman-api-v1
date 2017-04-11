@@ -33,8 +33,7 @@ module.exports = {
     },
     categories: {
       collection: 'PetCareCategory',
-      via: 'petCare',
-      dominant: true
+      via: 'owners'
     }
   },
 
@@ -43,9 +42,9 @@ module.exports = {
     let whereQuery = categories ? { id: categories } : {};
     let petCareIds = [];
     let petCareCount;
-    return PetCareCategory.find().where(whereQuery).populate('petCare')
+    return PetCareCategory.find().where(whereQuery).populate('owners')
       .then(petCareCategories => {
-        petCareCategories.forEach(petCareCategory => petCareCategory.petCare.forEach(c => petCareIds.push(c.id)));
+        petCareCategories.forEach(petCareCategory => petCareCategory.owners.forEach(c => petCareIds.push(c.id)));
         return PetCare.count().where({id: petCareIds})
       })
       .then(count => {
@@ -64,11 +63,12 @@ module.exports = {
   getPins(categories) {
     // TODO: find more effective way
     let whereQuery = categories ? { id: categories } : {};
-    return PetCareCategory.find().where(whereQuery).populate('petCare')
+
+    return PetCareCategory.find().where(whereQuery).populate('owners')
       .then(petCareCategories => {
         let result = [];
 
-        petCareCategories.forEach(c => result = result.concat(c.petCare));
+        petCareCategories.forEach(c => result = result.concat(c.owners));
         return result;
       });
   },
