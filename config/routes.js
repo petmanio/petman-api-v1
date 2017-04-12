@@ -48,9 +48,9 @@ module.exports.routes = {
   'GET /api/shop/list': 'ShopController.list',
   'GET /api/shop/pins': 'ShopController.pins',
 
-  'GET /api/pet-care/list': 'PetCareController.list',
-  'GET /api/pet-care/pins': 'PetCareController.pins',
-  'GET /api/pet-care/filters': 'PetCareController.filters'
+  'GET /api/location/list': 'LocationController.list',
+  'GET /api/location/pins': 'LocationController.pins',
+  'GET /api/location/filters': 'LocationController.filters'
 
   /***************************************************************************
   *                                                                          *

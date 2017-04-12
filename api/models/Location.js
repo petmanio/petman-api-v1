@@ -1,5 +1,5 @@
 /**
- * PetCare.js
+ * Location.js
  *
  * @description :: TODO: You might write a short summary of how this model works and what it represents here.
  * @docs        :: http://sailsjs.org/documentation/concepts/models-and-orm/models
@@ -32,28 +32,28 @@ module.exports = {
       defaultsTo: null
     },
     categories: {
-      collection: 'PetCareCategory',
-      via: 'owners'
+      collection: 'Category',
+      via: 'locations',
     }
   },
 
   getList(skip = 0, limit = 10, categories) {
     // TODO: find more effective way
     let whereQuery = categories ? { id: categories } : {};
-    let petCareIds = [];
-    let petCareCount;
-    return PetCareCategory.find().where(whereQuery).populate('owners')
-      .then(petCareCategories => {
-        petCareCategories.forEach(petCareCategory => petCareCategory.owners.forEach(c => petCareIds.push(c.id)));
-        return PetCare.count().where({id: petCareIds})
+    let locationIds = [];
+    let locationsCount;
+    return Category.find().where(whereQuery).populate('locations')
+      .then(categories => {
+        categories.forEach(category => category.locations.forEach(location => locationIds.push(location.id)));
+        return Location.count().where({id: locationIds})
       })
       .then(count => {
-        petCareCount = count;
-        return PetCare.find().where({id: petCareIds}).skip(skip).limit(limit);
+        locationsCount = count;
+        return Location.find().where({id: locationIds}).skip(skip).limit(limit);
       })
       .then(list => {
         return {
-          count: petCareCount,
+          count: locationsCount,
           list
         }
       });
@@ -64,18 +64,18 @@ module.exports = {
     // TODO: find more effective way
     let whereQuery = categories ? { id: categories } : {};
 
-    return PetCareCategory.find().where(whereQuery).populate('owners')
-      .then(petCareCategories => {
+    return Category.find().where(whereQuery).populate('locations')
+      .then(categories => {
         let result = [];
 
-        petCareCategories.forEach(c => result = result.concat(c.owners));
+        categories.forEach(category => result = result.concat(category.locations));
         return result;
       });
   },
 
   getCategories() {
-    // TODO: use PetCare model
-    return PetCareCategory.find();
+    // TODO: use Location model
+    return Category.find();
   }
 };
 
