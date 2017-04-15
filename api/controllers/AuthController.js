@@ -33,7 +33,7 @@ module.exports = {
   },
 
   currentUser(req, res, next) {
-    res.ok(req.user);
+    res.ok(req.user.toJSON());
   }
 };
 

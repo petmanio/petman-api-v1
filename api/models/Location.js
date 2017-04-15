@@ -5,6 +5,11 @@
  * @docs        :: http://sailsjs.org/documentation/concepts/models-and-orm/models
  */
 
+// TODO: update table names
+// TODO: use through for ManyToMany
+// TODO: update all column names for all relations
+// TODO: use
+
 module.exports = {
   attributes: {
     name: {
@@ -41,7 +46,7 @@ module.exports = {
     // TODO: find more effective way
     let whereQuery = categories ? { id: categories } : {};
     let locationIds = [];
-    let locationsCount;
+    let locationsCount = 0;
     return Category.find().where(whereQuery).populate('locations')
       .then(categories => {
         categories.forEach(category => category.locations.forEach(location => locationIds.push(location.id)));

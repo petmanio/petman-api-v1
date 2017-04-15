@@ -1,4 +1,4 @@
-const package = require('../package.json');
+const petmanApi = require('../package.json');
 /**
  * Route Mappings
  * (sails.config.routes)
@@ -35,8 +35,8 @@ module.exports.routes = {
 
   '/': (req, res) => {
     res.json({
-      name: package.name,
-      version: package.version
+      name: petmanApi.name,
+      version: petmanApi.version
     });
   },
 
@@ -50,8 +50,9 @@ module.exports.routes = {
 
   'GET /api/location/list': 'LocationController.list',
   'GET /api/location/pins': 'LocationController.pins',
-  'GET /api/location/filters': 'LocationController.filters'
+  'GET /api/location/filters': 'LocationController.filters',
 
+  'GET /api/room/list': 'RoomController.list',
   /***************************************************************************
   *                                                                          *
   * Custom routes here...                                                    *

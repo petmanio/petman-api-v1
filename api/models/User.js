@@ -22,6 +22,17 @@ module.exports = {
     },
     userData:{
       model: 'UserData'
+    },
+    rooms: {
+      collection: 'Room',
+      via: 'user'
+    },
+
+    toJSON() {
+      const obj = this.toObject();
+      delete obj.password;
+      delete obj.authProviders;
+      return obj;
     }
   }
 };
