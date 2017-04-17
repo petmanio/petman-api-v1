@@ -8,17 +8,9 @@
 module.exports = {
   tableName: 'room_image',
   attributes: {
-    name: {
+    src: {
       type: 'string',
-      defaultsTo: null
-    },
-    description: {
-      type: 'string',
-      defaultsTo: null
-    },
-    thumbnail: {
-      type: 'string',
-      defaultsTo: null
+      required: true
     },
     room: {
       model: 'Room'

@@ -10,6 +10,8 @@
  *
  */
 
+const path = require('path');
+
 module.exports = {
 
   /***************************************************************************
@@ -25,6 +27,8 @@ module.exports = {
     appId: '782744788540027',
     appSecret: '7d3159295adb9b081368044ca72e3af2',
     scope: 'public_profile,email'
-  }
+  },
+
+  uploadDir: path.join(__dirname, '../../upload')
 
 };

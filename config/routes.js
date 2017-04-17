@@ -53,6 +53,7 @@ module.exports.routes = {
   'GET /api/location/filters': 'LocationController.filters',
 
   'GET /api/room/list': 'RoomController.list',
+  'POST /api/room/create': 'RoomController.create',
   /***************************************************************************
   *                                                                          *
   * Custom routes here...                                                    *

@@ -4,20 +4,25 @@
  * @description :: TODO: You might write a short summary of how this model works and what it represents here.
  * @docs        :: http://sailsjs.org/documentation/concepts/models-and-orm/models
  */
-
+// TODO: add required options
 module.exports = {
   attributes: {
     name: {
       type: 'string',
-      defaultsTo: null
+      required: true
     },
     description: {
       type: 'string',
-      defaultsTo: null
+      required: true
+    },
+    cost: {
+      type: 'float',
+      required: true
     },
     images: {
       collection: 'RoomImage',
-      via: 'room'
+      via: 'room',
+      required: true
     },
     user: {
       model: 'User'
@@ -29,7 +34,7 @@ module.exports = {
     return Room.count()
       .then(count => {
         roomsCount = count;
-        return Room.find().populate('images').skip(skip).limit(limit);
+        return Room.find().populate('images').populate('user').skip(skip).limit(limit);
       })
       .then(list => {
         return {
