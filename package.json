@@ -5,6 +5,7 @@
   "description": "a Sails application",
   "keywords": [],
   "dependencies": {
+    "express": "^4.15.2",
     "fb": "^1.1.1",
     "grunt": "^1.0.1",
     "include-all": "^1.0.0",

@@ -1,4 +1,4 @@
-const express = require('../node_modules/sails/node_modules/express');
+const express = require('express');
 const path = require('path');
 
 /**
