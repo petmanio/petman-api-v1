@@ -31,5 +31,5 @@ module.exports = {
 
   // TODO: user static path config system
   uploadDir: path.join(__dirname, '../../upload'),
-
+  appHost: 'http://localhost:1337'
 };

@@ -22,7 +22,7 @@ module.exports = {
       const obj = this.toObject();
       // TODO: user config for upload path, getBaseUrl is deprecated
       return {
-        src: url.resolve(sails.getBaseUrl(), 'upload' + obj.src)
+        src: url.resolve(sails.config.appHost, 'upload' + obj.src)
       };
     }
   }
