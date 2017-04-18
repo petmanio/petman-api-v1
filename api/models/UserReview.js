@@ -1,29 +1,26 @@
 /**
- * AuthProvider.js
+ * Review.js
  *
  * @description :: TODO: You might write a short summary of how this model works and what it represents here.
  * @docs        :: http://sailsjs.org/documentation/concepts/models-and-orm/models
  */
-
+// TODO: add required options
 module.exports = {
-  modelName: 'auth_provider',
+  tableName: 'user_review',
   attributes: {
-    user: {
-      model: 'User'
-    },
-    provider: {
-      type: 'string',
-      enum: ['FACEBOOK'],
+    rating: {
+      type: 'float',
       required: true
     },
-    fbId: {
-      type: 'string',
-      defaultsTo: null,
-      unique: true
-    },
-    fbAccessToken: {
+    text: {
       type: 'string',
       defaultsTo: null
+    },
+    reviewer: {
+      model: 'User'
+    },
+    user: {
+      model: 'User'
     }
   }
 };

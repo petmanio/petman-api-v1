@@ -1,3 +1,6 @@
+const express = require('../node_modules/sails/node_modules/express');
+const path = require('path');
+
 /**
  * HTTP Server Settings
  * (sails.config.http)
@@ -8,7 +11,6 @@
  * For more information on configuration, check out:
  * http://sailsjs.org/#!/documentation/reference/sails.config/sails.config.http.html
  */
-
 module.exports.http = {
 
   /****************************************************************************
@@ -21,6 +23,11 @@ module.exports.http = {
   *                                                                           *
   ****************************************************************************/
 
+  customMiddleware: (app) => {
+    // TODO: use const
+    app.use('/upload',express.static(path.join(__dirname, '../upload')));
+  },
+
   middleware: {
 
   /***************************************************************************
@@ -30,23 +37,22 @@ module.exports.http = {
   *                                                                          *
   ***************************************************************************/
 
-    // order: [
-    //   'startRequestTimer',
-    //   'cookieParser',
-    //   'session',
-    //   'myRequestLogger',
-    //   'bodyParser',
-    //   'handleBodyParserError',
-    //   'compress',
-    //   'methodOverride',
-    //   'poweredBy',
-    //   '$custom',
-    //   'router',
-    //   'www',
-    //   'favicon',
-    //   '404',
-    //   '500'
-    // ],
+    order: [
+      'startRequestTimer',
+      'cookieParser',
+      'session',
+      'bodyParser',
+      'handleBodyParserError',
+      'compress',
+      'methodOverride',
+      'poweredBy',
+      '$custom',
+      'router',
+      'www',
+      'favicon',
+      '404',
+      '500'
+    ],
 
   /****************************************************************************
   *                                                                           *
@@ -54,10 +60,6 @@ module.exports.http = {
   *                                                                           *
   ****************************************************************************/
 
-    // myRequestLogger: function (req, res, next) {
-    //     console.log("Requested :: ", req.method, req.url);
-    //     return next();
-    // }
 
 
   /***************************************************************************

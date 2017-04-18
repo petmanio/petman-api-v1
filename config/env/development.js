@@ -29,6 +29,7 @@ module.exports = {
     scope: 'public_profile,email'
   },
 
-  uploadDir: path.join(__dirname, '../../upload')
+  // TODO: user static path config system
+  uploadDir: path.join(__dirname, '../../upload'),
 
 };

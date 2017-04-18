@@ -6,6 +6,7 @@
  */
 
 module.exports = {
+  modelName: 'user_data',
   attributes: {
     user: {
       model: 'User'
