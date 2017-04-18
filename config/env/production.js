@@ -9,6 +9,7 @@
  * any private information to this file!
  *
  */
+const path = require('path');
 
 module.exports = {
 
