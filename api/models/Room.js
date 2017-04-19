@@ -82,5 +82,37 @@ module.exports = {
     //   .then(result => {
     //     return result.rows
     //   })
+  },
+
+  getRoomById(roomId) {
+    // TODO: find more right way
+    return Room.findOne({id: roomId})
+      .populate('images')
+      .populate('user')
+      .then(room => {
+        return UserReview.find({user: room.user.id})
+          .then(reviews => {
+            const promises = [];
+            reviews.forEach(review => {
+              const deferred = Q.defer();
+              promises.push(deferred.promise);
+              User.findOne({id: review.reviewer}).populate('userData')
+                .then(review => deferred.resolve(review))
+                .catch(deferred.reject)
+            });
+
+            return Q.all(promises);
+          })
+          .then(reviews => {
+            return User.findOne({id: room.user.id}).populate('userData')
+              .then(user => {
+                room = room.toJSON();
+                user = user.toJSON();
+                user.reviews = reviews;
+                room.user = user;
+                return room
+              });
+          });
+      });
   }
 };

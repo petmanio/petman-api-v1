@@ -35,6 +35,12 @@ module.exports = {
         uploadedImages.forEach(image => fs.unlink(image.fd));
         next(err)
       })
+  },
+
+  getById(req, res, next) {
+	  return Room.getRoomById(req.param('roomId'))
+      .then(room => res.json(room))
+      .catch(next)
   }
 };
 
