@@ -21,9 +21,12 @@ module.exports = {
 
     toJSON() {
       const obj = this.toObject();
-      // TODO: user config for upload path, getBaseUrl is deprecated
+      let src = obj.src;
+      if (!obj.src.match("://")) {
+        src = url.resolve(sails.config.appHost, 'upload' + obj.src)
+      }
       return {
-        src: url.resolve(sails.config.appHost, 'upload' + obj.src)
+        src,
       };
     }
   }
