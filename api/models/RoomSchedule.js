@@ -1,26 +1,34 @@
 /**
- * Review.js
+ * RoomSchedule.js
  *
  * @description :: TODO: You might write a short summary of how this model works and what it represents here.
  * @docs        :: http://sailsjs.org/documentation/concepts/models-and-orm/models
  */
 // TODO: add required options
 module.exports = {
-  tableName: 'user_review',
+  tableName: 'room_schedule',
   attributes: {
     rating: {
-      type: 'float',
+      type: 'integer',
+    },
+    review: {
+      type: 'string'
+    },
+    consumer: {
+      model: 'User',
       required: true
     },
-    text: {
-      type: 'string',
+    provider: {
+      model: 'User',
+      required: true
+    },
+    room: {
+      model: 'Room',
+      required: true
+    },
+    deletedAt: {
+      type: 'datetime',
       defaultsTo: null
-    },
-    reviewer: {
-      model: 'User'
-    },
-    user: {
-      model: 'User'
     }
   }
 };

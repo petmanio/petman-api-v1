@@ -27,10 +27,6 @@ module.exports = {
       collection: 'Room',
       via: 'user'
     },
-    reviews: {
-      collection: 'UserReview',
-      via: 'user'
-    },
 
     toJSON() {
       const obj = this.toObject();

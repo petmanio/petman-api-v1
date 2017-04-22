@@ -17,7 +17,7 @@ module.exports = {
       defaultsTo: null
     },
     date: {
-      type: 'date',
+      type: 'datetime',
       defaultsTo: null
     },
     link: {

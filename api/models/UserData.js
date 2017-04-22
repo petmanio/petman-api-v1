@@ -6,7 +6,7 @@
  */
 
 module.exports = {
-  modelName: 'user_data',
+  tableName: 'user_data',
   attributes: {
     user: {
       model: 'User'

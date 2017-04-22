@@ -13,8 +13,11 @@ module.exports = function(req, res, next) {
   if (token) {
     AuthService.getUserByToken(token)
       .then((user) => {
-        req.user = user;
-        next();
+        if (user) {
+          req.user = user;
+          return next();
+        }
+        res.unauthorized();
       })
       .catch(err => res.unauthorized());
   } else {

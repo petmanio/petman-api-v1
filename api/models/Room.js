@@ -21,10 +21,18 @@ module.exports = {
       type: 'float',
       required: true
     },
+    limit: {
+      type: 'integer',
+      required: true
+    },
     images: {
       collection: 'RoomImage',
       via: 'room',
       required: true
+    },
+    schedules: {
+      collection: 'RoomSchedule',
+      via: 'room'
     },
     user: {
       model: 'User'
@@ -34,29 +42,28 @@ module.exports = {
   getList(skip = 0, limit = 10) {
     // TODO: find more right way
     let roomsCount = 0;
+
     return Room.count()
       .then(count => {
         roomsCount = count;
         return Room.find()
           .populate('images')
-          .populate('user')
-          .skip(skip).limit(limit)
+          .populate('schedules')
+          .skip(skip)
+          .limit(limit)
       })
       .then(rooms => {
         const promises = [];
         rooms.forEach(room => {
           const deferred = Q.defer();
           promises.push(deferred.promise);
-          UserReview.find({user: room.user.id})
-            .then(reviews => {
-              return User.findOne({id: room.user.id}).populate('userData')
-                .then(user => {
-                  room = room.toJSON();
-                  user = user.toJSON();
-                  user.reviews = reviews;
-                  room.user = user;
-                  deferred.resolve(room);
-                });
+          User.findOne({id: room.user})
+            .populate('userData')
+            .then(user => {
+              room = room.toJSON();
+              user = user.toJSON();
+              room.user = user;
+              deferred.resolve(room);
             })
             .catch(deferred.reject);
         });
@@ -69,50 +76,47 @@ module.exports = {
           list: list
         }
       });
-
-    // const roomQuery = Q.nbind(Room.query, {rowAsArray: true});
-    //
-    // return roomQuery(`
-    //   SELECT *
-    //   FROM room as r
-    //     INNER JOIN public."user" as u ON r."user" = u.id
-    //     INNER JOIN user_review as ur ON u.id = ur."user"
-    //     INNER JOIN public."user" as reviewer ON ur.reviewer = u.id;
-    // `)
-    //   .then(result => {
-    //     return result.rows
-    //   })
   },
 
   getRoomById(roomId) {
     // TODO: find more right way
+    let room = null;
+
     return Room.findOne({id: roomId})
       .populate('images')
-      .populate('user')
-      .then(room => {
-        return UserReview.find({user: room.user.id})
-          .then(reviews => {
-            const promises = [];
-            reviews.forEach(review => {
-              const deferred = Q.defer();
-              promises.push(deferred.promise);
-              User.findOne({id: review.reviewer}).populate('userData')
-                .then(review => deferred.resolve(review))
-                .catch(deferred.reject)
-            });
+      .then(data => {
+        room = data;
+        return User.findOne({id: room.user})
+          .populate('userData')
+      })
+      .then(user => {
+        room = room.toJSON();
+        user = user.toJSON();
+        room.user = user;
+        return RoomSchedule.find({room: room.id});
+      })
+      .then(schedules => {
+        let promises = [];
 
-            return Q.all(promises);
-          })
-          .then(reviews => {
-            return User.findOne({id: room.user.id}).populate('userData')
-              .then(user => {
-                room = room.toJSON();
-                user = user.toJSON();
-                user.reviews = reviews;
-                room.user = user;
-                return room
-              });
-          });
+        schedules.forEach(schedule => {
+          let deferred = Q.defer();
+          promises.push(deferred.promise);
+
+          User.findOne({id: schedule.consumer})
+            .populate('userData')
+            .then(consumer => {
+              consumer = consumer.toJSON();
+              schedule.consumer = consumer;
+              deferred.resolve(schedule);
+            })
+            .catch(deferred.reject);
+        });
+
+        return Q.all(promises);
+      })
+      .then(schedules => {
+        room.schedules = schedules;
+        return room;
       });
-  }
+  },
 };

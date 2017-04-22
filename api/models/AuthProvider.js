@@ -6,22 +6,22 @@
  */
 
 module.exports = {
-  modelName: 'auth_provider',
+  tableName: 'auth_provider',
   attributes: {
     user: {
       model: 'User'
     },
-    provider: {
+    type: {
       type: 'string',
       enum: ['FACEBOOK'],
       required: true
     },
-    fbId: {
+    externalId: {
       type: 'string',
       defaultsTo: null,
       unique: true
     },
-    fbAccessToken: {
+    accessToken: {
       type: 'string',
       defaultsTo: null
     }

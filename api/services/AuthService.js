@@ -28,12 +28,12 @@ module.exports = {
     });
   },
 
-  findOrCreateFbUser(fbUser, fbAccessToken) {
+  findOrCreateFbUser(fbUser, accessToken) {
     let userInstance;
-    return AuthProvider.findOne({fbId: fbUser.id}).populate('user')
+    return AuthProvider.findOne({externalId: fbUser.id}).populate('user')
       .then((auth) => {
         if (auth) {
-          auth.fbAccessToken = fbAccessToken;
+          auth.accessToken = accessToken;
           return auth.save().then(() => User.findOneById(auth.user));
         } else {
           return User.create({
@@ -43,9 +43,9 @@ module.exports = {
             userInstance = user;
             return q.all([
               AuthProvider.create({
-                provider: 'FACEBOOK',
-                fbId: fbUser.id,
-                fbAccessToken: fbAccessToken,
+                type: 'FACEBOOK',
+                externalId: fbUser.id,
+                accessToken,
                 user: user.id
               }),
               UserData.create({

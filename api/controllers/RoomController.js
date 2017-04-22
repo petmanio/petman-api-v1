@@ -24,6 +24,7 @@ module.exports = {
           name: req.body.name,
           description: req.body.description,
           cost: req.body.cost,
+          limit: req.body.limit,
           user: req.user,
           images: images.map(image => {
             return { src: image.fd.replace(config.uploadDir, '') }
