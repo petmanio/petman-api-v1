@@ -40,7 +40,10 @@ module.exports = {
 
   getById(req, res, next) {
 	  return Room.getRoomById(req.param('roomId'))
-      .then(room => res.json(room))
+      .then(room => {
+        room.isOwner = room.user.id === req.user.id;
+        res.json(room)
+      })
       .catch(next)
   }
 };

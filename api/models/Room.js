@@ -7,6 +7,7 @@ const nestedPop = require('nested-pop');
  * @docs        :: http://sailsjs.org/documentation/concepts/models-and-orm/models
  */
 // TODO: add required options
+// TODO: add pet type
 module.exports = {
   attributes: {
     // name: {
@@ -36,6 +37,10 @@ module.exports = {
     },
     user: {
       model: 'User'
+    },
+    isAvailable: {
+      type: 'boolean',
+      defaultsTo: true
     }
   },
 

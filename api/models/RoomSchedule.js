@@ -11,6 +11,10 @@ module.exports = {
     rating: {
       type: 'integer',
     },
+    count: {
+      type: 'integer',
+      required: true
+    },
     review: {
       type: 'string'
     },
@@ -24,6 +28,14 @@ module.exports = {
     },
     room: {
       model: 'Room',
+      required: true
+    },
+    startedAt: {
+      type: 'datetime',
+      required: true
+    },
+    endedAt: {
+      type: 'datetime',
       required: true
     },
     deletedAt: {
