@@ -31,6 +31,10 @@ module.exports.policies = {
 
   AuthController: {
     'login': []
+  },
+
+  RoomController: {
+    'apply': ['tokenAuth', 'roomExists', 'canApplyForRoom']
   }
 
   /***************************************************************************

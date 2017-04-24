@@ -11,10 +11,11 @@ module.exports = {
     rating: {
       type: 'integer',
     },
-    count: {
-      type: 'integer',
-      required: true
-    },
+    // TODO: functionality for future
+    // count: {
+    //   type: 'integer',
+    //   required: true
+    // },
     review: {
       type: 'string'
     },
@@ -30,14 +31,27 @@ module.exports = {
       model: 'Room',
       required: true
     },
-    startedAt: {
-      type: 'datetime',
-      required: true
+    status: {
+      type: 'string',
+      enum: [
+        'CONFIRMED',
+        'WAITING_CONSUMER_CONFIRM',
+        'WAITING_PROVIDER_CONFIRM',
+        'DECLINED_BY_CONSUMER',
+        'DECLINED_BY_PROVIDER',
+        'FINISHED'
+      ],
+      defaultsTo: 'WAITING_PROVIDER_CONFIRM'
     },
-    endedAt: {
-      type: 'datetime',
-      required: true
-    },
+    // TODO: functionality for future
+    // startedAt: {
+    //   type: 'datetime',
+    //   required: true
+    // },
+    // endedAt: {
+    //   type: 'datetime',
+    //   required: true
+    // },
     deletedAt: {
       type: 'datetime',
       defaultsTo: null

@@ -25,7 +25,7 @@ module.exports = {
           description: req.body.description,
           cost: req.body.cost,
           limit: req.body.limit,
-          user: req.user,
+          user: req.pmUser,
           images: images.map(image => {
             return { src: image.fd.replace(config.uploadDir, '') }
           })
@@ -41,10 +41,20 @@ module.exports = {
   getById(req, res, next) {
 	  return Room.getRoomById(req.param('roomId'))
       .then(room => {
-        room.isOwner = room.user.id === req.user.id;
+        room.isOwner = room.user.id === req.pmUser.id;
         res.json(room)
       })
       .catch(next)
-  }
+  },
+
+  apply(req, res, next) {
+    RoomSchedule.create({
+      consumer: req.pmUser.id,
+      provider: req.pmRoom.user,
+      room: req.pmRoom.id
+    })
+      .then(schedule => res.created())
+      .catch(next);
+  },
 };
 

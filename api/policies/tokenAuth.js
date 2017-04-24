@@ -8,16 +8,22 @@
  *
  */
 module.exports = function(req, res, next) {
-
   const token = req.header('x-auth-token');
+  let user;
   if (token) {
     AuthService.getUserByToken(token)
-      .then((user) => {
+      .then((data) => {
+      user = data;
         if (user) {
-          req.user = user;
-          return next();
+          // TODO: update
+          return Room.count({user: user.id})
         }
         res.unauthorized();
+      })
+      .then(count => {
+        user.isSitter = (count !== 0);
+        req.pmUser = user;
+        next();
       })
       .catch(err => res.unauthorized());
   } else {

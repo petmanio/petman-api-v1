@@ -22,10 +22,11 @@ module.exports = {
       type: 'float',
       required: true
     },
-    limit: {
-      type: 'integer',
-      required: true
-    },
+    // TODO: functionality for future
+    // limit: {
+    //   type: 'integer',
+    //   required: true
+    // },
     images: {
       collection: 'RoomImage',
       via: 'room',
@@ -98,7 +99,7 @@ module.exports = {
         room = room.toJSON();
         user = user.toJSON();
         room.user = user;
-        return RoomSchedule.find({room: room.id});
+        return RoomSchedule.find({room: room.id, status: 'CONFIRMED'});
       })
       .then(schedules => {
         let promises = [];
