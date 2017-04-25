@@ -48,12 +48,12 @@ module.exports = {
   },
 
   apply(req, res, next) {
-    RoomSchedule.create({
+    RoomApplication.create({
       consumer: req.pmUser.id,
       provider: req.pmRoom.user,
       room: req.pmRoom.id
     })
-      .then(schedule => res.created())
+      .then(application => res.created())
       .catch(next);
   },
 };

@@ -32,8 +32,8 @@ module.exports = {
       via: 'room',
       required: true
     },
-    schedules: {
-      collection: 'RoomSchedule',
+    applications: {
+      collection: 'RoomApplication',
       via: 'room'
     },
     user: {
@@ -54,7 +54,7 @@ module.exports = {
         roomsCount = count;
         return Room.find()
           .populate('images')
-          .populate('schedules')
+          .populate('applications')
           .skip(skip)
           .limit(limit)
       })
@@ -99,29 +99,29 @@ module.exports = {
         room = room.toJSON();
         user = user.toJSON();
         room.user = user;
-        return RoomSchedule.find({room: room.id, status: 'CONFIRMED'});
+        return RoomApplication.find({room: room.id, status: 'CONFIRMED'});
       })
-      .then(schedules => {
+      .then(applications => {
         let promises = [];
 
-        schedules.forEach(schedule => {
+        applications.forEach(application => {
           let deferred = Q.defer();
           promises.push(deferred.promise);
 
-          User.findOne({id: schedule.consumer})
+          User.findOne({id: application.consumer})
             .populate('userData')
             .then(consumer => {
               consumer = consumer.toJSON();
-              schedule.consumer = consumer;
-              deferred.resolve(schedule);
+              application.consumer = consumer;
+              deferred.resolve(application);
             })
             .catch(deferred.reject);
         });
 
         return Q.all(promises);
       })
-      .then(schedules => {
-        room.schedules = schedules;
+      .then(applications => {
+        room.applications = applications;
         return room;
       });
   },

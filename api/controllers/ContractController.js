@@ -1,5 +1,5 @@
 /**
- * ContractController
+ * ApplicationController
  *
  * @description :: Server-side logic for managing Shops
  * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
@@ -14,7 +14,7 @@ module.exports = {
   },
 
   count(req, res, next) {
-    RoomSchedule.count({
+    RoomApplication.count({
       or : [
         { provider: req.pmUser.id },
         { consumer: req.pmUser.id }
@@ -25,13 +25,13 @@ module.exports = {
   },
 
   _blogList(req, res, next) {
-	  RoomSchedule.find({
+	  RoomApplication.find({
       or : [
         { provider: req.pmUser.id },
         { consumer: req.pmUser.id }
       ]
     })
-      .then(schedules => res.json(schedules))
+      .then(applications => res.json({list: applications}))
       .catch(next);
   }
 };
