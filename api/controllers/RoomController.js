@@ -39,7 +39,7 @@ module.exports = {
   },
 
   getById(req, res, next) {
-	  return Room.getRoomById(req.param('roomId'))
+	  return Room.getRoomById(req.param('roomId'), req.pmUser.id)
       .then(room => {
         room.isOwner = room.user.id === req.pmUser.id;
         res.json(room)

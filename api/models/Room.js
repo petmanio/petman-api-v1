@@ -84,7 +84,7 @@ module.exports = {
       });
   },
 
-  getRoomById(roomId) {
+  getRoomById(roomId, userId) {
     // TODO: find more right way
     let room = null;
 
@@ -99,7 +99,16 @@ module.exports = {
         room = room.toJSON();
         user = user.toJSON();
         room.user = user;
-        return RoomApplication.find({room: room.id, status: 'CONFIRMED'});
+        return RoomApplication.find(
+          {room: room.id},
+          {
+            or : [
+              { status: 'CONFIRMED' },
+              { provider: userId },
+              { consumer: userId }
+            ]
+          }
+        );
       })
       .then(applications => {
         let promises = [];

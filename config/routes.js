@@ -57,8 +57,8 @@ module.exports.routes = {
   'POST /api/room/create': 'RoomController.create',
   'POST /api/room/:roomId/apply': 'RoomController.apply',
 
-  'GET /api/application/list': 'ApplicationController.list',
-  'GET /api/application/count': 'ApplicationController.count',
+  'GET /api/notification/list': 'NotificationController.list',
+  'GET /api/notification/count': 'NotificationController.count',
   /***************************************************************************
   *                                                                          *
   * Custom routes here...                                                    *
