@@ -7,6 +7,7 @@
 const config = sails.config;
 const path = require('path');
 const fs = require('fs');
+const _ = require('lodash');
 
 module.exports = {
 	list(req, res, next) {
@@ -48,12 +49,20 @@ module.exports = {
   },
 
   apply(req, res, next) {
-    RoomApplication.create({
+    RoomApplication.findOrCreate({
       consumer: req.pmUser.id,
       provider: req.pmRoom.user,
       room: req.pmRoom.id
     })
       .then(application => res.created())
+      .catch(next);
+  },
+
+  updateApplication(req, res, next) {
+	  // TODO: add validations
+    req.pmRoomApplication.status = req.body.status;
+    req.pmRoomApplication.save()
+      .then(application => res.json(req.pmRoomApplication))
       .catch(next);
   },
 };

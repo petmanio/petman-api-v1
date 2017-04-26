@@ -1,5 +1,5 @@
 /**
- * canApplyForRoom
+ * roomApplicationExists
  *
  * @module      :: Policy
  * @description :: Simple policy to allow any authenticated user
@@ -8,8 +8,13 @@
  *
  */
 module.exports = function(req, res, next) {
-  if (req.pmUser.id === req.pmRoom.user) {
-    return res.badRequest();
-  }
-  next();
+  const applicationId = req.param('applicationId');
+  RoomApplication.findOne({id: applicationId})
+    .then(application => {
+      if (application) {
+        req.pmRoomApplication = application;
+        return next();
+      }
+      res.notFound();
+    });
 };

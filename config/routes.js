@@ -56,6 +56,7 @@ module.exports.routes = {
   'GET /api/room/:roomId': 'RoomController.getById',
   'POST /api/room/create': 'RoomController.create',
   'POST /api/room/:roomId/apply': 'RoomController.apply',
+  'PUT /api/room/application/:applicationId': 'RoomController.updateApplication',
 
   'GET /api/notification/list': 'NotificationController.list',
   'GET /api/notification/count': 'NotificationController.count',

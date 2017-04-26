@@ -103,7 +103,6 @@ module.exports = {
           {room: room.id},
           {
             or : [
-              { status: 'CONFIRMED' },
               { provider: userId },
               { consumer: userId }
             ]
@@ -117,11 +116,16 @@ module.exports = {
           let deferred = Q.defer();
           promises.push(deferred.promise);
 
-          User.findOne({id: application.consumer})
+          User.findOne({id: room.user.id === userId ? application.provider : application.consumer})
             .populate('userData')
-            .then(consumer => {
-              consumer = consumer.toJSON();
-              application.consumer = consumer;
+            .then(user => {
+              user = user.toJSON();
+              if (room.user.id === userId) {
+                application.provider = user;
+              } else {
+                application.consumer = user;
+              }
+
               deferred.resolve(application);
             })
             .catch(deferred.reject);

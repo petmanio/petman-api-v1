@@ -1,5 +1,5 @@
 /**
- * canApplyForRoom
+ * canUpdateRoomApplication
  *
  * @module      :: Policy
  * @description :: Simple policy to allow any authenticated user
@@ -8,8 +8,8 @@
  *
  */
 module.exports = function(req, res, next) {
-  if (req.pmUser.id === req.pmRoom.user) {
-    return res.badRequest();
+  if (req.pmUser.id === req.pmRoomApplication.provider || req.pmUser.id === req.pmRoomApplication.consumer) {
+    return next();
   }
-  next();
+  res.badRequest();
 };
