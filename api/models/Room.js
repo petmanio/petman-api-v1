@@ -107,7 +107,7 @@ module.exports = {
               { consumer: userId }
             ]
           }
-        );
+        ).sort({createdAt: 'desc'});
       })
       .then(applications => {
         let promises = [];

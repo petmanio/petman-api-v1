@@ -49,10 +49,11 @@ module.exports = {
   },
 
   apply(req, res, next) {
-    RoomApplication.findOrCreate({
+	  RoomApplication.findOrCreate({
       consumer: req.pmUser.id,
       provider: req.pmRoom.user,
-      room: req.pmRoom.id
+      room: req.pmRoom.id,
+      status: 'WAITING'
     })
       .then(application => res.created())
       .catch(next);
