@@ -57,6 +57,9 @@ module.exports.routes = {
   'POST /api/room/create': 'RoomController.create',
   'POST /api/room/:roomId/apply': 'RoomController.apply',
   'PUT /api/room/application/:applicationId': 'RoomController.updateApplication',
+  'GET /api/room/application/:applicationId/message/list': 'RoomController.getApplicationMessageList',
+  'GET /api/room/application/:applicationId/message/join': 'RoomController.applicationMessageJoin',
+  'POST /api/room/application/:applicationId/message/create': 'RoomController.createApplicationMessage',
 
   'GET /api/notification/list': 'NotificationController.list',
   'GET /api/notification/count': 'NotificationController.count',

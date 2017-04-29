@@ -8,7 +8,14 @@
  *
  */
 module.exports = function(req, res, next) {
-  const token = req.header('x-auth-token');
+  let token;
+  if (req.isSocket) {
+    token = req.body['x-auth-token'];
+    delete req.body['x-auth-token'];
+  } else {
+    token = req.header('x-auth-token');
+  }
+
   let user;
   if (token) {
     AuthService.getUserByToken(token)

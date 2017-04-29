@@ -31,6 +31,10 @@ module.exports = {
       model: 'Room',
       required: true
     },
+    messages: {
+      collection: 'RoomApplicationMessage',
+      via: 'application'
+    },
     status: {
       type: 'string',
       enum: [
