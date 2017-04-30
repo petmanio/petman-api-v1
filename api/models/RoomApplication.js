@@ -51,10 +51,10 @@ module.exports = {
     //   type: 'datetime',
     //   required: true
     // },
-    // endedAt: {
-    //   type: 'datetime',
-    //   required: true
-    // },
+    finishedAt: {
+      type: 'datetime',
+      required: true
+    },
     deletedAt: {
       type: 'datetime',
       defaultsTo: null

@@ -101,7 +101,11 @@ module.exports = {
         room.user = user;
         return RoomApplication.find({ room: room.id }).where(
           {
-            or : [{ consumer: userId }, { provider: userId }]
+            or : [
+              { consumer: userId },
+              { provider: userId },
+              { status: 'FINISHED' }
+            ]
           }
         ).sort({createdAt: 'desc'});
       })

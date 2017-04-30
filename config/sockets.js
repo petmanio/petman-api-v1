@@ -136,8 +136,12 @@ module.exports.sockets = {
   * transport should be disabled.                                            *
   *                                                                          *
   ***************************************************************************/
-  transports: ["polling", "websocket"],
+  // transports: ["polling", "websocket"],
 
-  onlyAllowOrigins: false
+  // onlyAllowOrigins: false,
+
+  // grant3rdPartyCookie: true,
+  //
+  // cookie: true
 
 };
