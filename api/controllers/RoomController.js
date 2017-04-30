@@ -71,10 +71,6 @@ module.exports = {
   getApplicationMessageList(req, res, next) {
 	  RoomApplicationMessage.getList(req.pmRoomApplication.id)
       .then(messages=> {
-        messages.list = messages.list.map(message => {
-          message.isOwner = req.pmUser.id === message.from.id;
-          return message;
-        });
         res.json(messages)
       })
       .catch(next);
@@ -113,7 +109,6 @@ module.exports = {
     })
       .then(message => {
         message = message.toJSON();
-        message.isOwner = req.pmUser.id === message.from;
         const deferred = Q.defer();
         User.findOne({id: message.to})
           .populate('userData')
