@@ -53,7 +53,7 @@ module.exports = {
     // },
     finishedAt: {
       type: 'datetime',
-      required: true
+      defaultsTo: null
     },
     deletedAt: {
       type: 'datetime',
