@@ -99,13 +99,9 @@ module.exports = {
         room = room.toJSON();
         user = user.toJSON();
         room.user = user;
-        return RoomApplication.find(
-          {room: room.id},
+        return RoomApplication.find({ room: room.id }).where(
           {
-            or : [
-              { provider: userId },
-              { consumer: userId }
-            ]
+            or : [{ consumer: userId }, { provider: userId }]
           }
         ).sort({createdAt: 'desc'});
       })
@@ -116,15 +112,11 @@ module.exports = {
           let deferred = Q.defer();
           promises.push(deferred.promise);
 
-          User.findOne({id: room.user.id === userId ? application.provider : application.consumer})
+          User.findOne({id: application.consumer})
             .populate('userData')
             .then(user => {
               user = user.toJSON();
-              if (room.user.id === userId) {
-                application.provider = user;
-              } else {
-                application.consumer = user;
-              }
+              application.consumer = user;
 
               deferred.resolve(application);
             })
