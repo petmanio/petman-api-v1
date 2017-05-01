@@ -63,6 +63,11 @@ module.exports = {
   updateApplication(req, res, next) {
 	  // TODO: add validations
     req.pmRoomApplication.status = req.body.status;
+    if (req.pmRoomApplication.status === 'FINISHED') {
+      req.pmRoomApplication.finishedAt = new Date();
+      req.pmRoomApplication.review = req.body.review;
+      req.pmRoomApplication.rating = req.body.rating;
+    }
     req.pmRoomApplication.save()
       .then(application => res.json(req.pmRoomApplication))
       .catch(next);
@@ -76,29 +81,8 @@ module.exports = {
       .catch(next);
   },
 
-  applicationMessageJoin(req, res, next) {
-    if (!req.isSocket) {
-      return res.badRequest();
-    }
-
-    const roomName = `room_application_message_${req.pmRoomApplication.room}_${req.pmRoomApplication.id}`;
-    sails.sockets.join(req, roomName, (err) => {
-      if (err) {
-        return next(err);
-      }
-
-      return res.json({
-        message: `Subscribed to a message room called ${roomName}`
-      });
-    });
-  },
-
   createApplicationMessage(req, res, next) {
 	  // TODO: application status validation
-    if (!req.isSocket) {
-      return res.badRequest();
-    }
-    const roomName = `room_application_message_${req.pmRoomApplication.room}_${req.pmRoomApplication.id}`;
 
     RoomApplicationMessage.create({
       from: req.pmUser.id,
@@ -133,7 +117,9 @@ module.exports = {
         return deferred.promise;
       })
       .then(message => {
-        sails.sockets.broadcast(roomName, 'roomApplicationMessage', message);
+        sails.sockets.broadcast([message.from.socketId, message.to.socketId].filter(Boolean),
+          'roomApplicationMessage', message);
+        res.ok();
       })
       .catch(next)
 

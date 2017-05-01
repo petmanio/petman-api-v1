@@ -36,7 +36,7 @@ module.exports = {
           auth.accessToken = accessToken;
           return auth.save().then(() => User.findOneById(auth.user));
         } else {
-          return User.create({
+          return User.findOrCreate({
             email: fbUser.email
           })
           .then((user) => {

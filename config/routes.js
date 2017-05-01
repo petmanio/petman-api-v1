@@ -43,6 +43,8 @@ module.exports.routes = {
   'POST /api/auth/login': 'AuthController.login',
   'GET /api/auth/current-user': 'AuthController.currentUser',
 
+  'PUT /api/user/store-socket-id': 'UserController.storeSocketId',
+
   'GET /api/blog/list': 'BlogController.list',
 
   'GET /api/shop/list': 'ShopController.list',
@@ -58,7 +60,6 @@ module.exports.routes = {
   'POST /api/room/:roomId/apply': 'RoomController.apply',
   'PUT /api/room/application/:applicationId': 'RoomController.updateApplication',
   'GET /api/room/application/:applicationId/message/list': 'RoomController.getApplicationMessageList',
-  'GET /api/room/application/:applicationId/message/join': 'RoomController.applicationMessageJoin',
   'POST /api/room/application/:applicationId/message/create': 'RoomController.createApplicationMessage',
 
   'GET /api/notification/list': 'NotificationController.list',
