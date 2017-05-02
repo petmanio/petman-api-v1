@@ -62,6 +62,11 @@ module.exports = {
 
   updateApplication(req, res, next) {
 	  // TODO: add validations
+    if (req.pmRoomApplication.status === 'FINISHED' &&
+      !req.pmRoomApplication.review && req.pmRoomApplication.provider === req.pmUser.id) {
+      return res.json(req.pmRoomApplication);
+    }
+
     req.pmRoomApplication.status = req.body.status;
     if (req.pmRoomApplication.status === 'FINISHED') {
       req.pmRoomApplication.finishedAt = new Date();
