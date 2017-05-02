@@ -50,13 +50,25 @@ module.exports = {
   },
 
   apply(req, res, next) {
+	  let newApplication;
 	  RoomApplication.findOrCreate({
       consumer: req.pmUser.id,
       provider: req.pmRoom.user,
       room: req.pmRoom.id,
       status: 'WAITING'
     })
-      .then(application => res.created())
+      .then(application => {
+        newApplication = application;
+        return User.findOne({
+          id: newApplication.provider === req.pmUser.id ? newApplication.consumer : newApplication.provider
+        });
+      })
+      .then(userForNotify => {
+        sails.sockets.broadcast([userForNotify.socketId].filter(Boolean),
+          'roomApplicationCreate', newApplication);
+        // TODO: send created application, update client side
+        res.created();
+      })
       .catch(next);
   },
 
