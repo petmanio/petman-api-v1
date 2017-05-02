@@ -59,15 +59,20 @@ module.exports = {
     })
       .then(application => {
         newApplication = application;
+        return User.findOne({id: application.consumer})
+          .populate('userData');
+      })
+      .then(consumer => {
+        newApplication = newApplication.toJSON();
+        newApplication.consumer = consumer;
         return User.findOne({
-          id: newApplication.provider === req.pmUser.id ? newApplication.consumer : newApplication.provider
+          id: newApplication.provider
         });
       })
       .then(userForNotify => {
         sails.sockets.broadcast([userForNotify.socketId].filter(Boolean),
           'roomApplicationCreate', newApplication);
-        // TODO: send created application, update client side
-        res.created();
+        res.json(newApplication);
       })
       .catch(next);
   },
