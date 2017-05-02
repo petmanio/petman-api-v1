@@ -69,7 +69,16 @@ module.exports = {
       req.pmRoomApplication.rating = req.body.rating;
     }
     req.pmRoomApplication.save()
-      .then(application => res.json(req.pmRoomApplication))
+      .then(application => {
+        return User.findOne({
+          id: req.pmRoomApplication.provider === req.pmUser.id ? req.pmRoomApplication.consumer : req.pmRoomApplication.provider
+        });
+      })
+      .then(userForNotify => {
+        sails.sockets.broadcast([userForNotify.socketId].filter(Boolean),
+          'roomApplicationUpdate', req.pmRoomApplication);
+        res.json(req.pmRoomApplication);
+      })
       .catch(next);
   },
 
