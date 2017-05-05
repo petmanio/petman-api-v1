@@ -40,6 +40,15 @@ module.exports.policies = {
     'getApplicationMessageList': ['tokenAuth', 'roomApplicationExists', 'isRoomApplicationMember'],
     'applicationMessageJoin': ['tokenAuth', 'roomApplicationExists', 'isRoomApplicationMember'],
     'createApplicationMessage': ['tokenAuth', 'roomApplicationExists', 'isRoomApplicationMember']
+  },
+
+  WalkerController: {
+    'getById': ['tokenAuth', 'walkerExists'],
+    'apply': ['tokenAuth', 'walkerExists', 'canApplyForWalker'],
+    'updateApplication': ['tokenAuth', 'walkerApplicationExists', 'isWalkerApplicationMember'],
+    'getApplicationMessageList': ['tokenAuth', 'walkerApplicationExists', 'isWalkerApplicationMember'],
+    'applicationMessageJoin': ['tokenAuth', 'walkerApplicationExists', 'isWalkerApplicationMember'],
+    'createApplicationMessage': ['tokenAuth', 'walkerApplicationExists', 'isWalkerApplicationMember']
   }
 
   /***************************************************************************

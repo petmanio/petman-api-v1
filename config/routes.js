@@ -62,6 +62,14 @@ module.exports.routes = {
   'GET /api/room/application/:applicationId/message/list': 'RoomController.getApplicationMessageList',
   'POST /api/room/application/:applicationId/message/create': 'RoomController.createApplicationMessage',
 
+  'GET /api/walker/list': 'WalkerController.list',
+  'GET /api/walker/:walkerId': 'WalkerController.getById',
+  'POST /api/walker/create': 'WalkerController.create',
+  'POST /api/walker/:walkerId/apply': 'WalkerController.apply',
+  'PUT /api/walker/application/:applicationId': 'WalkerController.updateApplication',
+  'GET /api/walker/application/:applicationId/message/list': 'WalkerController.getApplicationMessageList',
+  'POST /api/walker/application/:applicationId/message/create': 'WalkerController.createApplicationMessage',
+
   'GET /api/notification/list': 'NotificationController.list',
   'GET /api/notification/count': 'NotificationController.count',
   /***************************************************************************
