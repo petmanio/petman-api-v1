@@ -79,6 +79,8 @@ module.exports = {
 
   updateApplication(req, res, next) {
 	  // TODO: add validations
+    let userForNotify;
+    let prevStatus = req.pmRoomApplication.status;
     if (req.pmRoomApplication.status === 'FINISHED' &&
       !req.pmRoomApplication.review && req.pmRoomApplication.provider === req.pmUser.id) {
       return res.json(req.pmRoomApplication);
@@ -91,14 +93,30 @@ module.exports = {
       req.pmRoomApplication.rating = req.body.rating;
     }
     req.pmRoomApplication.save()
-      .then(application => {
+      .then(() => {
         return User.findOne({
           id: req.pmRoomApplication.provider === req.pmUser.id ? req.pmRoomApplication.consumer : req.pmRoomApplication.provider
         });
       })
-      .then(userForNotify => {
+      .then(data => {
+        userForNotify = data;
+        return Notification.create({
+          from: req.pmUser.id,
+          to: userForNotify.id,
+          roomApplicationStatusUpdate: {
+            room: req.pmRoomApplication.room,
+            prevStatus: prevStatus,
+            currentStatus: req.pmRoomApplication.status
+          }
+        });
+      })
+      .then((notification) => {
         sails.sockets.broadcast([userForNotify.socketId].filter(Boolean),
           'roomApplicationUpdate', req.pmRoomApplication);
+
+        sails.sockets.broadcast([userForNotify.socketId].filter(Boolean),
+          'notificationRoomApplicationStatusUpdate', notification);
+
         res.json(req.pmRoomApplication);
       })
       .catch(next);

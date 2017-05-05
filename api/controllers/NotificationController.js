@@ -9,15 +9,9 @@ const path = require('path');
 const fs = require('fs');
 
 module.exports = {
-	list(req, res, next) {
-	  res.json({
-      list: [],
-      count: null
-    })
-  },
-
-  count(req, res, next) {
-    res.ok({count: null})
+  list(req, res, next) {
+    Notification.getList(req.query.skip, req.query.limit, req.pmUser.id)
+      .then(notifications => res.ok(notifications))
+      .catch(next);
   }
 };
-
