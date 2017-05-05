@@ -17,10 +17,23 @@ module.exports = {
       model: 'User',
       required: true
     },
+    roomApplicationCreate: {
+      model: 'NotificationRoomApplicationCreate'
+    },
     roomApplicationStatusUpdate: {
-      collection: 'NotificationRoomApplicationStatusUpdate',
-      via: 'notification',
-      required: true
+      model: 'NotificationRoomApplicationStatusUpdate'
+    },
+    roomApplicationMessageCreate: {
+      model: 'NotificationRoomApplicationMessageCreate'
+    },
+    walkerApplicationCreate: {
+      model: 'NotificationWalkerApplicationCreate'
+    },
+    walkerApplicationStatusUpdate: {
+      model: 'NotificationWalkerApplicationStatusUpdate'
+    },
+    walkerApplicationMessageCreate: {
+      model: 'NotificationWalkerApplicationMessageCreate'
     },
     seen: {
       type: 'boolean',

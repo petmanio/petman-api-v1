@@ -1,27 +1,23 @@
 /**
- * NotificationRoomApplicationStatusUpdate.js
+ * NotificationWalkerApplicationMessageCreate.js
  *
  * @description :: TODO: You might write a short summary of how this model works and what it represents here.
  * @docs        :: http://sailsjs.org/documentation/concepts/models-and-orm/models
  */
 
 module.exports = {
-  tableName: 'notification_room_application_status_update',
+  tableName: 'notification_walker_application_message_create',
   attributes: {
-    room: {
-      model: 'Room',
+    walker: {
+      model: 'Walker',
       required: true
     },
     application: {
-      model: 'RoomApplication',
+      model: 'WalkerApplication',
       required: true
     },
-    prevStatus: {
-      type: 'string',
-      required: true
-    },
-    currentStatus: {
-      type: 'string',
+    message: {
+      model: 'WalkerApplicationMessage',
       required: true
     }
   }

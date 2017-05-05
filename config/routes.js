@@ -70,8 +70,7 @@ module.exports.routes = {
   'GET /api/walker/application/:applicationId/message/list': 'WalkerController.getApplicationMessageList',
   'POST /api/walker/application/:applicationId/message/create': 'WalkerController.createApplicationMessage',
 
-  'GET /api/notification/list': 'NotificationController.list',
-  'GET /api/notification/count': 'NotificationController.count',
+  'GET /api/notification/list': 'NotificationController.list'
   /***************************************************************************
   *                                                                          *
   * Custom routes here...                                                    *

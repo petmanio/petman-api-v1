@@ -40,7 +40,8 @@ module.exports = {
 
   apply(req, res, next) {
 	  let newApplication;
-	  WalkerApplication.findOrCreate({
+    let userForNotify;
+    WalkerApplication.findOrCreate({
       consumer: req.pmUser.id,
       provider: req.pmWalker.user,
       walker: req.pmWalker.id,
@@ -58,9 +59,29 @@ module.exports = {
           id: newApplication.provider
         });
       })
-      .then(userForNotify => {
-        sails.sockets.broadcast([userForNotify.socketId].filter(Boolean),
-          'walkerApplicationCreate', newApplication);
+      .then(data => {
+        userForNotify = data;
+        return Notification.create({
+          from: req.pmUser.id,
+          to: userForNotify.id,
+          walkerApplicationCreate: {
+            walker: newApplication.walker,
+            application: newApplication.id
+          }
+        });
+      })
+      .then((notification) => {
+        return User.findOne({id: notification.from})
+          .populate('userData')
+          .then(user => {
+            notification = notification.toJSON();
+            notification.from = user;
+            return notification;
+          })
+      })
+      .then(notification => {
+        sails.sockets.broadcast(userForNotify.socketId, 'notificationNew', notification);
+        sails.sockets.broadcast(userForNotify.socketId, 'walkerApplicationCreate', newApplication);
         res.json(newApplication);
       })
       .catch(next);
@@ -68,6 +89,8 @@ module.exports = {
 
   updateApplication(req, res, next) {
 	  // TODO: add validations
+    let userForNotify;
+    let prevStatus = req.pmRoomApplication.status;
     if (req.pmWalkerApplication.status === 'FINISHED' &&
       !req.pmWalkerApplication.review && req.pmWalkerApplication.provider === req.pmUser.id) {
       return res.json(req.pmWalkerApplication);
@@ -80,14 +103,36 @@ module.exports = {
       req.pmWalkerApplication.rating = req.body.rating;
     }
     req.pmWalkerApplication.save()
-      .then(application => {
+      .then(() => {
         return User.findOne({
           id: req.pmWalkerApplication.provider === req.pmUser.id ? req.pmWalkerApplication.consumer : req.pmWalkerApplication.provider
         });
       })
-      .then(userForNotify => {
-        sails.sockets.broadcast([userForNotify.socketId].filter(Boolean),
-          'walkerApplicationUpdate', req.pmWalkerApplication);
+      .then(data => {
+        userForNotify = data;
+        return Notification.create({
+          from: req.pmUser.id,
+          to: userForNotify.id,
+          walkerApplicationStatusUpdate: {
+            walker: req.pmWalkerApplication.walker,
+            application: req.pmWalkerApplication.id,
+            prevStatus: prevStatus,
+            currentStatus: req.pmWalkerApplication.status
+          }
+        });
+      })
+      .then(notification => {
+        return Q.all([
+          Notification.findOne({id: notification.id}).populate('walkerApplicationStatusUpdate'),
+          User.findOne({id: notification.from}).populate('userData')
+        ])
+      })
+      .then(result => {
+        result[0] = result[0].toJSON();
+        result[1] = result[1].toJSON();
+        result[0].from = result[1];
+        sails.sockets.broadcast(userForNotify.socketId, 'walkerApplicationUpdate', req.pmWalkerApplication);
+        sails.sockets.broadcast(userForNotify.socketId, 'notificationNew', result[0]);
         res.json(req.pmWalkerApplication);
       })
       .catch(next);
@@ -103,7 +148,7 @@ module.exports = {
 
   createApplicationMessage(req, res, next) {
 	  // TODO: application status validation
-
+    let message;
     WalkerApplicationMessage.create({
       from: req.pmUser.id,
       to: req.pmWalkerApplication.consumer === req.pmUser.id ?
@@ -136,9 +181,26 @@ module.exports = {
 
         return deferred.promise;
       })
-      .then(message => {
+      .then(data => {
+        message = data;
+        return Notification.create({
+          from: req.pmUser.id,
+          to: message.to.id,
+          walkerApplicationMessageCreate: {
+            walker: req.pmWalkerApplication.walker,
+            application: req.pmWalkerApplication.id,
+            message: message.id,
+          }
+        });
+      })
+      .then(notification => {
+        notification = notification.toJSON();
+        notification.from = message.from;
+
         sails.sockets.broadcast([message.from.socketId, message.to.socketId].filter(Boolean),
           'walkerApplicationMessage', message);
+
+        sails.sockets.broadcast(message.to.socketId, 'notificationNew', notification);
         res.ok();
       })
       .catch(next)
