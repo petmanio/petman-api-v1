@@ -68,7 +68,13 @@ module.exports = {
             walker: newApplication.walker,
             application: newApplication.id
           }
-        });
+        })
+          .then(notification => {
+            return Notification.findOne({id: notification.id})
+            .populate('walkerApplicationCreate')
+              .populate('walkerApplicationStatusUpdate')
+              .populate('walkerApplicationMessageCreate')
+          });
       })
       .then((notification) => {
         return User.findOne({id: notification.from})
@@ -90,7 +96,8 @@ module.exports = {
   updateApplication(req, res, next) {
 	  // TODO: add validations
     let userForNotify;
-    let prevStatus = req.pmRoomApplication.status;
+    let notification;
+    let prevStatus = req.pmWalkerApplication.status;
     if (req.pmWalkerApplication.status === 'FINISHED' &&
       !req.pmWalkerApplication.review && req.pmWalkerApplication.provider === req.pmUser.id) {
       return res.json(req.pmWalkerApplication);
@@ -119,20 +126,24 @@ module.exports = {
             prevStatus: prevStatus,
             currentStatus: req.pmWalkerApplication.status
           }
-        });
+        })
+          .then(notification => {
+            return Notification.findOne({id: notification.id})
+              .populate('walkerApplicationCreate')
+              .populate('walkerApplicationStatusUpdate')
+              .populate('walkerApplicationMessageCreate');
+          });
       })
-      .then(notification => {
-        return Q.all([
-          Notification.findOne({id: notification.id}).populate('walkerApplicationStatusUpdate'),
-          User.findOne({id: notification.from}).populate('userData')
-        ])
+      .then(data => {
+        notification = data;
+        return User.findOne({id: notification.from}).populate('userData');
       })
-      .then(result => {
-        result[0] = result[0].toJSON();
-        result[1] = result[1].toJSON();
-        result[0].from = result[1];
+      .then(user => {
+        notification = notification.toJSON();
+        user = user.toJSON();
+        notification.from = user;
         sails.sockets.broadcast(userForNotify.socketId, 'walkerApplicationUpdate', req.pmWalkerApplication);
-        sails.sockets.broadcast(userForNotify.socketId, 'notificationNew', result[0]);
+        sails.sockets.broadcast(userForNotify.socketId, 'notificationNew', notification);
         res.json(req.pmWalkerApplication);
       })
       .catch(next);
@@ -191,7 +202,13 @@ module.exports = {
             application: req.pmWalkerApplication.id,
             message: message.id,
           }
-        });
+        })
+          .then(notification => {
+            return Notification.findOne({id: notification.id})
+              .populate('walkerApplicationCreate')
+              .populate('walkerApplicationStatusUpdate')
+              .populate('walkerApplicationMessageCreate');
+          })
       })
       .then(notification => {
         notification = notification.toJSON();

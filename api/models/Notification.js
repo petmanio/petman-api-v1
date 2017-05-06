@@ -50,7 +50,12 @@ module.exports = {
         notificationsCount = count;
         return Notification.find({to: userId})
           .sort({createdAt: 'desc'})
+          .populate('roomApplicationCreate')
           .populate('roomApplicationStatusUpdate')
+          .populate('roomApplicationMessageCreate')
+          .populate('walkerApplicationCreate')
+          .populate('walkerApplicationStatusUpdate')
+          .populate('walkerApplicationMessageCreate')
           .skip(skip)
           .limit(limit)
       })

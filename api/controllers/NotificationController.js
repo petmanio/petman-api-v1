@@ -13,5 +13,11 @@ module.exports = {
     Notification.getList(req.query.skip, req.query.limit, req.pmUser.id)
       .then(notifications => res.ok(notifications))
       .catch(next);
+  },
+
+  seen(req, res, next) {
+    Notification.update({id: req.body.notifications, to: req.pmUser.id}, {seen: true})
+      .then(notifications => res.ok({notifications: req.body.notifications}))
+      .catch(next);
   }
 };

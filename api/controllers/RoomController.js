@@ -79,7 +79,13 @@ module.exports = {
             room: newApplication.room,
             application: newApplication.id
           }
-        });
+        })
+          .then(notification => {
+            return Notification.findOne({id: notification.id})
+              .populate('roomApplicationCreate')
+              .populate('roomApplicationStatusUpdate')
+              .populate('roomApplicationMessageCreate');
+          });
       })
       .then((notification) => {
 	      return User.findOne({id: notification.from})
@@ -101,6 +107,7 @@ module.exports = {
   updateApplication(req, res, next) {
 	  // TODO: add validations
     let userForNotify;
+    let notification;
     let prevStatus = req.pmRoomApplication.status;
     if (req.pmRoomApplication.status === 'FINISHED' &&
       !req.pmRoomApplication.review && req.pmRoomApplication.provider === req.pmUser.id) {
@@ -130,20 +137,24 @@ module.exports = {
             prevStatus: prevStatus,
             currentStatus: req.pmRoomApplication.status
           }
-        });
+        })
+          .then(notification => {
+            return Notification.findOne({id: notification.id})
+              .populate('roomApplicationCreate')
+              .populate('roomApplicationStatusUpdate')
+              .populate('roomApplicationMessageCreate');
+          });
       })
-      .then(notification => {
-        return Q.all([
-          Notification.findOne({id: notification.id}).populate('roomApplicationStatusUpdate'),
-          User.findOne({id: notification.from}).populate('userData')
-        ])
+      .then(data => {
+        notification = data;
+        return User.findOne({id: notification.from}).populate('userData');
       })
-      .then(result => {
-        result[0] = result[0].toJSON();
-        result[1] = result[1].toJSON();
-        result[0].from = result[1];
+      .then(user => {
+        notification = notification.toJSON();
+        user = user.toJSON();
+        notification.from = user;
         sails.sockets.broadcast(userForNotify.socketId, 'roomApplicationUpdate', req.pmRoomApplication);
-        sails.sockets.broadcast(userForNotify.socketId, 'notificationNew', result[0]);
+        sails.sockets.broadcast(userForNotify.socketId, 'notificationNew', notification);
         res.json(req.pmRoomApplication);
       })
       .catch(next);
@@ -202,7 +213,13 @@ module.exports = {
             application: req.pmRoomApplication.id,
             message: message.id,
           }
-        });
+        })
+          .then(notification => {
+            return Notification.findOne({id: notification.id})
+              .populate('roomApplicationCreate')
+              .populate('roomApplicationStatusUpdate')
+              .populate('roomApplicationMessageCreate');
+          });
       })
       .then(notification => {
         notification = notification.toJSON();
