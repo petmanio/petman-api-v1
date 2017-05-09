@@ -70,6 +70,10 @@ module.exports.routes = {
   'GET /api/walker/application/:applicationId/message/list': 'WalkerController.getApplicationMessageList',
   'POST /api/walker/application/:applicationId/message/create': 'WalkerController.createApplicationMessage',
 
+  'GET /api/adopt/list': 'AdoptController.list',
+  'GET /api/adopt/:adoptId': 'AdoptController.getById',
+  'POST /api/adopt/create': 'AdoptController.create',
+
   'GET /api/notification/list': 'NotificationController.list',
   'PUT /api/notification/seen': 'NotificationController.seen'
   /***************************************************************************

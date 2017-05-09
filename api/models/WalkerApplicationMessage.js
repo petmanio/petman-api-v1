@@ -21,6 +21,10 @@ module.exports = {
       model: 'WalkerApplication',
       required: true
     },
+    walker: {
+      model: 'Room',
+      required: true
+    },
     message: {
       type: 'string',
       required: true

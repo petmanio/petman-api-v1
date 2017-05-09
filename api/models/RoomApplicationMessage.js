@@ -21,6 +21,10 @@ module.exports = {
       model: 'RoomApplication',
       required: true
     },
+    room: {
+      model: 'Room',
+      required: true
+    },
     message: {
       type: 'string',
       required: true

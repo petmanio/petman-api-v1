@@ -175,6 +175,7 @@ module.exports = {
       from: req.pmUser.id,
       to: req.pmRoomApplication.consumer === req.pmUser.id ?
         req.pmRoomApplication.provider : req.pmRoomApplication.consumer,
+      room: req.pmRoomApplication.room,
       message: req.body.message,
       application: req.pmRoomApplication.id
     })

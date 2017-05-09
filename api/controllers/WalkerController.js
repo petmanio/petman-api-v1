@@ -164,6 +164,7 @@ module.exports = {
       from: req.pmUser.id,
       to: req.pmWalkerApplication.consumer === req.pmUser.id ?
         req.pmWalkerApplication.provider : req.pmWalkerApplication.consumer,
+      walker: req.pmWalkerApplication.walker,
       message: req.body.message,
       application: req.pmWalkerApplication.id
     })
