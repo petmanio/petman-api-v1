@@ -20,6 +20,10 @@ module.exports = {
       collection: 'AuthProvider',
       via: 'user'
     },
+    pets: {
+      collection: 'Pet',
+      via: 'users'
+    },
     userData:{
       model: 'UserData'
     },
