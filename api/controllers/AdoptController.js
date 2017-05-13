@@ -38,12 +38,55 @@ module.exports = {
   },
 
   getById(req, res, next) {
-	  return Adopt.getAdoptById(req.param('adoptId'), req.pmUser.id)
+	  return Adopt.getAdoptById(req.pmAdopt.id)
       .then(adopt => {
-        adopt.isOwner = adopt.user.id === req.pmUser.id;
         res.json(adopt)
       })
       .catch(next)
+  },
+
+  getCommentList(req, res, next) {
+    AdoptComment.getList(req.pmAdopt.id)
+      .then(comments => {
+        res.json(comments)
+      })
+      .catch(next);
+  },
+
+  createComment(req, res, next) {
+	  let comment;
+    AdoptComment.create({
+      user: req.pmUser.id,
+      adopt: req.pmAdopt.id,
+      comment: req.body.comment
+    })
+      .then(comment => {
+        return User.findOne({id: req.pmUser.id})
+          .populate('userData')
+          .then(user => {
+            comment = comment.toJSON();
+            comment.user = user;
+            return comment;
+          });
+      })
+      .then(data => {
+        comment = data;
+        // TODO: improve, only unique userIds
+        return AdoptComment.find({ select: ['user'], adopt: req.pmAdopt.id });
+      })
+      .then(userComments => {
+        const userIds = _(userComments).map('user').uniqBy().value();
+        return User.find({select: ['id', 'socketId'], id: userIds});
+      })
+      .then(userToUpdate => {
+        const userForSendComment = _(userToUpdate).map('socketId').value();
+
+        // TODO: only send new message to receiver using socket
+        sails.sockets.broadcast(userForSendComment.filter(Boolean), 'adoptComment', comment);
+        res.ok();
+      })
+      .catch(next)
   }
+
 };
 

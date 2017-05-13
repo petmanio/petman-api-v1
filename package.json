@@ -10,6 +10,7 @@
     "grunt": "^1.0.1",
     "include-all": "^1.0.0",
     "jsonwebtoken": "^7.3.0",
+    "lodash": "^4.17.4",
     "nested-pop": "^0.1.4",
     "osmosis": "^1.1.2",
     "q": "^1.4.1",

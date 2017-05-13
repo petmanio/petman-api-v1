@@ -30,7 +30,7 @@ module.exports = {
   },
 
   getById(req, res, next) {
-	  return Walker.getWalkerById(req.param('walkerId'), req.pmUser.id)
+	  return Walker.getWalkerById(req.pmWalker.id, req.pmUser.id)
       .then(walker => {
         walker.isOwner = walker.user.id === req.pmUser.id;
         res.json(walker)

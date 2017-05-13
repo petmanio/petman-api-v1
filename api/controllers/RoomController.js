@@ -41,7 +41,7 @@ module.exports = {
   },
 
   getById(req, res, next) {
-	  return Room.getRoomById(req.param('roomId'), req.pmUser.id)
+	  return Room.getRoomById(req.pmRoom.id, req.pmUser.id)
       .then(room => {
         room.isOwner = room.user.id === req.pmUser.id;
         res.json(room)
@@ -226,6 +226,7 @@ module.exports = {
         notification = notification.toJSON();
         notification.from = message.from;
 
+        // TODO: only send new message to receiver using socket
         sails.sockets.broadcast([message.from.socketId, message.to.socketId].filter(Boolean),
           'roomApplicationMessage', message);
 

@@ -70,7 +70,7 @@ module.exports = {
       });
   },
 
-  getAdoptById(adoptId, userId) {
+  getAdoptById(adoptId) {
     // TODO: find more right way
     let adopt = null;
 
