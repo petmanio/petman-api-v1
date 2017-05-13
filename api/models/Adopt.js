@@ -18,16 +18,17 @@ module.exports = {
       via: 'adopt',
       required: true
     },
+    comments: {
+      collection: 'AdoptComment',
+      via: 'adopt'
+    },
     user: {
-      model: 'User'
+      model: 'User',
+      required: true
     },
     deletedAt: {
       type: 'datetime',
       defaultsTo: null
-    },
-    contactPhone: {
-      type: 'string',
-      required: true
     }
   },
 

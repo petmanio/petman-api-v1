@@ -8,7 +8,7 @@ const path = require('path');
 const url = require('url');
 
 module.exports = {
-  tableName: 'room_image',
+  tableName: 'pet_image',
   attributes: {
     src: {
       type: 'string',

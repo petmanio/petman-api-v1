@@ -22,15 +22,10 @@ module.exports = function(req, res, next) {
       .then((data) => {
       user = data;
         if (user) {
-          // TODO: update
-          return Room.count({user: user.id})
+          req.pmUser = user;
+          return next();
         }
         res.unauthorized();
-      })
-      .then(count => {
-        user.isSitter = (count !== 0);
-        req.pmUser = user;
-        next();
       })
       .catch(err => res.unauthorized());
   } else {

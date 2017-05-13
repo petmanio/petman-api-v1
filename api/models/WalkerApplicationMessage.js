@@ -41,6 +41,7 @@ module.exports = {
 
   getList(applicationId) {
     // TODO: better way
+    // TODO: add limit and skip
     return WalkerApplicationMessage
       .find({application: applicationId})
       .sort({ createdAt: 'asc' })

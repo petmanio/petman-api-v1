@@ -24,7 +24,6 @@ module.exports = {
         uploadedImages = images;
         return Adopt.create({
           description: req.body.description,
-          contactPhone: req.body.contactPhone,
           user: req.pmUser,
           images: images.map(image => {
             return { src: image.fd.replace(config.uploadDir, '') }
