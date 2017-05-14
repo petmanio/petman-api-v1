@@ -9,7 +9,6 @@ module.exports = {
   attributes: {
     source: {
       type: 'string',
-      enum: ['SEEKER'],
       required: true
     },
     description: {
