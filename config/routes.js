@@ -75,6 +75,7 @@ module.exports.routes = {
   'POST /api/adopt/create': 'AdoptController.create',
   'GET /api/adopt/:adoptId/comment/list': 'AdoptController.getCommentList',
   'POST /api/adopt/:adoptId/comment/create': 'AdoptController.createComment',
+  'GET /api/adopt/:adoptId/comment/join': 'AdoptController.joinComment',
 
   'GET /api/notification/list': 'NotificationController.list',
   'PUT /api/notification/seen': 'NotificationController.seen'

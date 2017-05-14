@@ -52,7 +52,8 @@ module.exports.policies = {
   AdoptController: {
     'getById': ['tokenAuth', 'adoptExists'],
     'getCommentList': ['tokenAuth', 'adoptExists'],
-    'createComment': ['tokenAuth', 'adoptExists']
+    'createComment': ['tokenAuth', 'adoptExists'],
+    'joinComment': ['tokenAuth', 'adoptExists']
   },
 
   /***************************************************************************

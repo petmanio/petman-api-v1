@@ -53,6 +53,15 @@ module.exports = {
       .catch(next);
   },
 
+  joinComment(req, res, next) {
+    if (!req.isSocket) {
+      return res.badRequest();
+    }
+
+    const roomName = `adopt_comment_${req.pmAdopt.id}`;
+    sails.sockets.join(req, roomName)
+  },
+
   createComment(req, res, next) {
 	  let comment;
 	  let usersForSendNotification;
@@ -80,11 +89,11 @@ module.exports = {
         return User.find({select: ['id', 'socketId'], id: userIds});
       })
       .then(userToUpdate => {
-        const userSocketIdForSendComment = _(userToUpdate).map('socketId').value();
         usersForSendNotification = _(userToUpdate).filter(user => user.id !== req.pmUser.id).value();
 
         // TODO: only send new message to receiver using socket
-        sails.sockets.broadcast(userSocketIdForSendComment.filter(Boolean), 'adoptComment', comment);
+        const roomName = `adopt_comment_${req.pmAdopt.id}`;
+        sails.sockets.broadcast(roomName, 'adoptComment', comment);
 
         return Q.all(usersForSendNotification.map(user => {
           return Notification.create({
