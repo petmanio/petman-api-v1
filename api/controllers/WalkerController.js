@@ -45,7 +45,7 @@ module.exports = {
       consumer: req.pmUser.id,
       provider: req.pmWalker.user,
       walker: req.pmWalker.id,
-      status: 'WAITING'
+      status: 'IN_PROGRESS'
     })
       .then(application => {
         newApplication = application;

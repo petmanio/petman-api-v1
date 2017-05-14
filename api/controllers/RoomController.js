@@ -56,7 +56,7 @@ module.exports = {
       consumer: req.pmUser.id,
       provider: req.pmRoom.user,
       room: req.pmRoom.id,
-      status: 'WAITING'
+      status: 'IN_PROGRESS'
     })
       .then(application => {
         newApplication = application;
