@@ -217,8 +217,6 @@ module.exports = {
         })
           .then(notification => {
             return Notification.findOne({id: notification.id})
-              .populate('roomApplicationCreate')
-              .populate('roomApplicationStatusUpdate')
               .populate('roomApplicationMessageCreate');
           });
       })

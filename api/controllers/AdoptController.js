@@ -55,6 +55,7 @@ module.exports = {
 
   createComment(req, res, next) {
 	  let comment;
+	  let usersForSendNotification;
     AdoptComment.create({
       user: req.pmUser.id,
       adopt: req.pmAdopt.id,
@@ -79,10 +80,36 @@ module.exports = {
         return User.find({select: ['id', 'socketId'], id: userIds});
       })
       .then(userToUpdate => {
-        const userForSendComment = _(userToUpdate).map('socketId').value();
+        const userSocketIdForSendComment = _(userToUpdate).map('socketId').value();
+        usersForSendNotification = _(userToUpdate).filter(user => user.id !== req.pmUser.id).value();
 
         // TODO: only send new message to receiver using socket
-        sails.sockets.broadcast(userForSendComment.filter(Boolean), 'adoptComment', comment);
+        sails.sockets.broadcast(userSocketIdForSendComment.filter(Boolean), 'adoptComment', comment);
+
+        return Q.all(usersForSendNotification.map(user => {
+          return Notification.create({
+            from: req.pmUser.id,
+            to: user.id,
+            adoptCommentCreate: {
+              adopt: req.pmAdopt.id,
+              comment: comment.id,
+            }
+          })
+            .then(notification => {
+              return Notification.findOne({id: notification.id})
+                .populate('adoptCommentCreate');
+            });
+        }));
+      })
+      .then(notifications => {
+        notifications.forEach(notification => {
+          notification = notification.toJSON();
+          notification.from = comment.user;
+          const socketToEmit = _.find(usersForSendNotification, {id: notification.to});
+          if (socketToEmit && socketToEmit.socketId) {
+            sails.sockets.broadcast(socketToEmit.socketId, 'notificationNew', notification);
+          }
+        });
         res.ok();
       })
       .catch(next)

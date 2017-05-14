@@ -6,13 +6,14 @@ const Q = require('q');
  * @docs        :: http://sailsjs.org/documentation/concepts/models-and-orm/models
  */
 // TODO: add required options
-// TODO: add pet type
+// TODO: update model for not using oneToOne relations
 module.exports = {
   attributes: {
     from: {
       model: 'User',
       required: true
     },
+    // TODO: create many to many relation for to
     to: {
       model: 'User',
       required: true
@@ -35,6 +36,9 @@ module.exports = {
     walkerApplicationMessageCreate: {
       model: 'NotificationWalkerApplicationMessageCreate'
     },
+    adoptCommentCreate: {
+      model: 'NotificationAdoptCommentCreate'
+    },
     seen: {
       type: 'boolean',
       defaultsTo: false
@@ -56,6 +60,7 @@ module.exports = {
           .populate('walkerApplicationCreate')
           .populate('walkerApplicationStatusUpdate')
           .populate('walkerApplicationMessageCreate')
+          .populate('adoptCommentCreate')
           .skip(skip)
           .limit(limit)
       })
