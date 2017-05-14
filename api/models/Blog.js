@@ -11,12 +11,12 @@ module.exports = {
       type: 'string',
       required: true
     },
-    description: {
+    icon: {
       type: 'string',
       defaultsTo: null
     },
-    date: {
-      type: 'datetime',
+    description: {
+      type: 'string',
       defaultsTo: null
     },
     link: {
