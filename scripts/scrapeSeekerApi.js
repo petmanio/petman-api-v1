@@ -68,6 +68,7 @@ function scape(page = 1, itemsPerPage = 3) {
         Blog.findOne({ link: item.link })
           .then(exists => {
             if (!exists) {
+              item.sourceCreatedAt = new Date(item.thumbnail.match(/\d{4}_\d{2}/g).join().replace('_', ' '));
               Blog.create(item)
                 .then(deferred.resolve(item))
                 .catch(deferred.reject);

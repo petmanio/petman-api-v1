@@ -15,6 +15,10 @@ module.exports = {
       type: 'string',
       defaultsTo: null
     },
+    sourceCreatedAt: {
+      type: 'datetime',
+      defaultsTo: null
+    },
     description: {
       type: 'string',
       defaultsTo: null
