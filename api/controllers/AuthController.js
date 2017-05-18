@@ -8,27 +8,33 @@
 module.exports = {
 	login(req, res, next) {
     if (req.body.fb) {
-      this.loginFb(...arguments)
+      this._loginFb(...arguments)
     } else if (req.body.local) {
-      this.loginLocal();
+      this._loginLocal();
     } else {
       res.badRequest()
     }
   },
 
-  loginLocal() {
+  _loginLocal() {
     res.status(501).end();
   },
 
-  loginFb(req, res, next) {
+  _loginFb(req, res, next) {
+	  let user;
     return AuthService.getUserFbDataByAccessToken(req.body.fb.accessToken)
       .then((fbUser) => {
         return AuthService.findOrCreateFbUser(fbUser, req.body.fb.accessToken);
       })
-      .then((user) => {
-        return AuthService.signUserId(user.id);
+      .then((userData) => {
+        return User.findOne({id: userData.id})
+          .populate('userData')
+          .then(userWithUserData => {
+            user = userWithUserData;
+            return AuthService.signUserId(user.id);
+          });
       })
-      .then(token => res.ok({ token }))
+      .then(token => res.ok({ token, user }))
       .catch(next);
   },
 

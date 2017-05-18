@@ -84,7 +84,7 @@ module.exports = {
       });
   },
 
-  getRoomById(roomId, userId) {
+  getRoomById(roomId, userId = null) {
     // TODO: find more right way
     let room = null;
 

@@ -78,7 +78,7 @@ module.exports = {
       });
   },
 
-  getWalkerById(walkerId, userId) {
+  getWalkerById(walkerId, userId = null) {
     // TODO: find more right way
     let walker = null;
 

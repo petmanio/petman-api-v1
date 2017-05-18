@@ -27,14 +27,24 @@ module.exports.policies = {
   ***************************************************************************/
 
   // '*': true,
-  '*': ['tokenAuth'],
+  // '*': ['tokenAuth'],
 
   AuthController: {
-    'login': []
+    'currentUser': ['tokenAuth']
+  },
+
+  UserController: {
+    'storeSocketId': ['tokenAuth']
+  },
+
+  NotificationController: {
+    'list': ['tokenAuth'],
+    'seen': ['tokenAuth']
   },
 
   RoomController: {
-    'getById': ['tokenAuth', 'roomExists'],
+    'create': ['tokenAuth'],
+    'getById': ['getUser', 'roomExists'],
     'apply': ['tokenAuth', 'roomExists', 'canApplyForRoom'],
     'updateApplication': ['tokenAuth', 'roomApplicationExists', 'isRoomApplicationMember'],
     'getApplicationMessageList': ['tokenAuth', 'roomApplicationExists', 'isRoomApplicationMember'],
@@ -42,7 +52,8 @@ module.exports.policies = {
   },
 
   WalkerController: {
-    'getById': ['tokenAuth', 'walkerExists'],
+    'create': ['tokenAuth'],
+    'getById': ['getUser', 'walkerExists'],
     'apply': ['tokenAuth', 'walkerExists', 'canApplyForWalker'],
     'updateApplication': ['tokenAuth', 'walkerApplicationExists', 'isWalkerApplicationMember'],
     'getApplicationMessageList': ['tokenAuth', 'walkerApplicationExists', 'isWalkerApplicationMember'],
@@ -50,10 +61,11 @@ module.exports.policies = {
   },
 
   AdoptController: {
-    'getById': ['tokenAuth', 'adoptExists'],
-    'getCommentList': ['tokenAuth', 'adoptExists'],
-    'createComment': ['tokenAuth', 'adoptExists'],
-    'joinComment': ['tokenAuth', 'adoptExists']
+    'create': ['tokenAuth'],
+    'getById': ['adoptExists'],
+    'getCommentList': ['adoptExists'],
+    'joinComment': ['adoptExists'],
+    'createComment': ['tokenAuth', 'adoptExists']
   },
 
   /***************************************************************************

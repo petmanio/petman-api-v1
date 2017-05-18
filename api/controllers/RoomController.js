@@ -41,9 +41,13 @@ module.exports = {
   },
 
   getById(req, res, next) {
-	  return Room.getRoomById(req.pmRoom.id, req.pmUser.id)
+	  return Room.getRoomById(req.pmRoom.id, req.pmUser && req.pmUser.id)
       .then(room => {
-        room.isOwner = room.user.id === req.pmUser.id;
+        if (req.pmUser) {
+          room.isOwner = room.user.id === req.pmUser.id;
+        } else {
+          room.isOwner = false;
+        }
         res.json(room)
       })
       .catch(next)
