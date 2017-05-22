@@ -118,6 +118,35 @@ module.exports = {
       return res.json(req.pmRoomApplication);
     }
 
+    function sendNewNotification() {
+      return Notification.create({
+        from: req.pmUser.id,
+        to: userForNotify.id,
+        roomApplicationStatusUpdate: {
+          room: req.pmRoomApplication.room,
+          application: req.pmRoomApplication.id,
+          prevStatus: prevStatus,
+          currentStatus: req.pmRoomApplication.status
+        }
+      })
+        .then(notification => {
+          return Notification.findOne({id: notification.id})
+            .populate('roomApplicationCreate')
+            .populate('roomApplicationStatusUpdate')
+            .populate('roomApplicationMessageCreate');
+        })
+        .then(data => {
+          notification = data;
+          return User.findOne({id: notification.from}).populate('userData');
+        })
+        .then(user => {
+          notification = notification.toJSON();
+          user = user.toJSON();
+          notification.from = user;
+          return sails.sockets.broadcast(userForNotify.socketId, 'notificationNew', notification);
+        });
+    }
+
     req.pmRoomApplication.status = req.body.status;
     if (req.pmRoomApplication.status === 'FINISHED') {
       req.pmRoomApplication.finishedAt = new Date();
@@ -132,33 +161,13 @@ module.exports = {
       })
       .then(data => {
         userForNotify = data;
-        return Notification.create({
-          from: req.pmUser.id,
-          to: userForNotify.id,
-          roomApplicationStatusUpdate: {
-            room: req.pmRoomApplication.room,
-            application: req.pmRoomApplication.id,
-            prevStatus: prevStatus,
-            currentStatus: req.pmRoomApplication.status
-          }
-        })
-          .then(notification => {
-            return Notification.findOne({id: notification.id})
-              .populate('roomApplicationCreate')
-              .populate('roomApplicationStatusUpdate')
-              .populate('roomApplicationMessageCreate');
-          });
+        if (prevStatus !== req.pmRoomApplication.status) {
+          return sendNewNotification();
+        }
+        return null;
       })
-      .then(data => {
-        notification = data;
-        return User.findOne({id: notification.from}).populate('userData');
-      })
-      .then(user => {
-        notification = notification.toJSON();
-        user = user.toJSON();
-        notification.from = user;
+      .then(() => {
         sails.sockets.broadcast(userForNotify.socketId, 'roomApplicationUpdate', req.pmRoomApplication);
-        sails.sockets.broadcast(userForNotify.socketId, 'notificationNew', notification);
         res.json(req.pmRoomApplication);
       })
       .catch(next);
