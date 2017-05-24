@@ -22,12 +22,19 @@ module.exports = {
     }
   },
 
-  getList(adoptId) {
+  getList(adoptId, skip = 0, limit = 10) {
     // TODO: better way
     // TODO: add limit and skip
-    return AdoptComment
-      .find({adopt: adoptId})
-      .sort({ createdAt: 'asc' })
+    let total = 0;
+    return AdoptComment.count({ adopt: adoptId })
+      .then(count => {
+        total = count;
+        return AdoptComment
+          .find({ adopt: adoptId })
+          .sort({ createdAt: 'desc' })
+          .skip(skip)
+          .limit(limit);
+      })
       .then(comments => {
         const promises = [];
         comments.forEach(comment => {
@@ -47,8 +54,9 @@ module.exports = {
       })
       .then(list => {
         return {
-          list,
-          adoptId
+          list: list.reverse(),
+          adoptId,
+          total
         }
       })
   }

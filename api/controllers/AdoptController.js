@@ -46,7 +46,7 @@ module.exports = {
   },
 
   getCommentList(req, res, next) {
-    AdoptComment.getList(req.pmAdopt.id)
+    AdoptComment.getList(req.pmAdopt.id, req.query.skip, req.query.limit)
       .then(comments => {
         res.json(comments)
       })
