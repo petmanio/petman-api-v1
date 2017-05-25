@@ -54,7 +54,7 @@ module.exports = {
       })
       .then(list => {
         return {
-          list: list.reverse(),
+          list: list,
           adoptId,
           total
         }
