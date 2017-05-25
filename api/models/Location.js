@@ -58,7 +58,7 @@ module.exports = {
       })
       .then(list => {
         return {
-          count: locationsCount,
+          total: locationsCount,
           list
         }
       });
