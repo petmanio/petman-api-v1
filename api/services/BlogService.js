@@ -4,15 +4,15 @@ module.exports = {
   },
 
   getList(skip = 0, limit = 10) {
-    let blogCount;
+    let total;
     return Blog.count()
       .then(count => {
-        blogCount = count;
+        total = count;
         return Blog.find({}).skip(skip).limit(limit);
       })
       .then(list => {
         return {
-          count: blogCount,
+          total,
           list
         }
       });
