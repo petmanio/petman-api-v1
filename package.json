@@ -27,7 +27,7 @@
     "lift": "sails lift",
     "debug": "node debug app.js",
     "start": "node app.js",
-    "forever": "forever app.js --prod"
+    "forever": "forever start app.js --prod"
   },
   "main": "app.js",
   "repository": {
