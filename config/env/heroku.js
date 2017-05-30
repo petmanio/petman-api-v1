@@ -37,17 +37,18 @@ module.exports = {
   // }
 
   models: {
-    connection: 'prodPostgres',
+    connection: 'herokuPostgres',
     migrate: 'safe'
   },
 
   fb: {
-    appId: '424363951255305',
-    appSecret: '353b283172fe3c8a691b4aa2ed6a66de',
+    appId: '1352754344791293',
+    appSecret: '2f1c93192e3ef95b50c787bc1b4ebe10',
     scope: 'public_profile,email'
   },
 
   // TODO: user static path config system
   uploadDir: path.join(__dirname, '../../upload'),
-  appHost: 'https://api.petman.io'
+  appHost: 'https://petman-api.herokuapp.com'
+
 };

@@ -91,7 +91,14 @@ module.exports.connections = {
   },
 
   prodPostgres: {
-    // url: 'postgres://foibrztxpbokmn:567be06af21a5a9471b1fa22890fd9fb80fc453a7b734bdb8ce5983d868cc4ff@ec2-54-75-239-190.eu-west-1.compute.amazonaws.com:5432/dfvgb5enpjlro4',
+    adapter: 'sails-postgresql',
+    host: 'localhost',
+    user: 'petman',
+    password: 'o7ZKBb9tBdszHVWCG7Rxfi1w7plar0epieDA3v86GzU=',
+    database: 'petman'
+  },
+
+  herokuPostgres: {
     adapter: 'sails-postgresql',
     host: 'ec2-54-75-239-190.eu-west-1.compute.amazonaws.com',
     user: 'foibrztxpbokmn',
