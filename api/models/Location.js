@@ -49,7 +49,6 @@ module.exports = {
     let locationsCount = 0;
     return Category.find()
       .where(whereQuery)
-      .sort({createdAt: 'desc'})
       .populate('locations')
       .then(categories => {
         categories.forEach(category => category.locations.forEach(location => locationIds.push(location.id)));
@@ -57,7 +56,12 @@ module.exports = {
       })
       .then(count => {
         locationsCount = count;
-        return Location.find().where({id: locationIds}).skip(skip).limit(limit);
+        return Location
+          .find()
+          .where({id: locationIds})
+          .skip(skip)
+          .limit(limit)
+          .sort({createdAt: 'desc'});
       })
       .then(list => {
         return {
