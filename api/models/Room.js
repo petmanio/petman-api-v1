@@ -57,6 +57,7 @@ module.exports = {
           .populate('applications')
           .skip(skip)
           .limit(limit)
+          .sort({createdAt: 'desc'});
       })
       .then(rooms => {
         const promises = [];

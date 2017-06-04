@@ -43,6 +43,7 @@ module.exports = {
           .populate('images')
           .skip(skip)
           .limit(limit)
+          .sort({createdAt: 'desc'});
       })
       .then(list => {
         const promises = [];
