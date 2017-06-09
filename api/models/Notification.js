@@ -39,6 +39,9 @@ module.exports = {
     adoptCommentCreate: {
       model: 'NotificationAdoptCommentCreate'
     },
+    lostFoundCommentCreate: {
+      model: 'NotificationLostFoundCommentCreate'
+    },
     seen: {
       type: 'boolean',
       defaultsTo: false
@@ -61,6 +64,7 @@ module.exports = {
           .populate('walkerApplicationStatusUpdate')
           .populate('walkerApplicationMessageCreate')
           .populate('adoptCommentCreate')
+          .populate('lostFoundCommentCreate')
           .skip(skip)
           .limit(limit)
       })

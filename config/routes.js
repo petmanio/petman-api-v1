@@ -80,6 +80,14 @@ module.exports.routes = {
   'POST /api/adopt/:adoptId/comment/create': 'AdoptController.createComment',
   'GET /api/adopt/:adoptId/comment/join': 'AdoptController.joinComment',
 
+  'GET /api/lost-found/list': 'LostFoundController.list',
+  'GET /api/lost-found/:lostFoundId': 'LostFoundController.getById',
+  'DELETE /api/lost-found/:lostFoundId': 'LostFoundController.deleteById',
+  'POST /api/lost-found/create': 'LostFoundController.create',
+  'GET /api/lost-found/:lostFoundId/comment/list': 'LostFoundController.getCommentList',
+  'POST /api/lost-found/:lostFoundId/comment/create': 'LostFoundController.createComment',
+  'GET /api/lost-found/:lostFoundId/comment/join': 'LostFoundController.joinComment',
+
   'GET /api/notification/list': 'NotificationController.list',
   'PUT /api/notification/seen': 'NotificationController.seen'
   /***************************************************************************

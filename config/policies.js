@@ -71,6 +71,15 @@ module.exports.policies = {
     'createComment': ['tokenAuth', 'adoptExists']
   },
 
+  LostFoundController: {
+    'create': ['tokenAuth'],
+    'getById': ['getUser', 'lostFoundExists'],
+    'deleteById': ['getUser', 'lostFoundExists', 'isLostFoundOwner'],
+    'getCommentList': ['lostFoundExists'],
+    'joinComment': ['lostFoundExists'],
+    'createComment': ['tokenAuth', 'lostFoundExists']
+  },
+
   /***************************************************************************
   *                                                                          *
   * Here's an example of mapping some policies to run before a controller    *
