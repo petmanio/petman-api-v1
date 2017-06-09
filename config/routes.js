@@ -56,6 +56,7 @@ module.exports.routes = {
 
   'GET /api/room/list': 'RoomController.list',
   'GET /api/room/:roomId': 'RoomController.getById',
+  'DELETE /api/room/:roomId': 'RoomController.deleteById',
   'POST /api/room/create': 'RoomController.create',
   'POST /api/room/:roomId/apply': 'RoomController.apply',
   'PUT /api/room/application/:applicationId': 'RoomController.updateApplication',
@@ -64,6 +65,7 @@ module.exports.routes = {
 
   'GET /api/walker/list': 'WalkerController.list',
   'GET /api/walker/:walkerId': 'WalkerController.getById',
+  'DELETE /api/walker/:walkerId': 'WalkerController.deleteById',
   'POST /api/walker/create': 'WalkerController.create',
   'POST /api/walker/:walkerId/apply': 'WalkerController.apply',
   'PUT /api/walker/application/:applicationId': 'WalkerController.updateApplication',
@@ -72,6 +74,7 @@ module.exports.routes = {
 
   'GET /api/adopt/list': 'AdoptController.list',
   'GET /api/adopt/:adoptId': 'AdoptController.getById',
+  'DELETE /api/adopt/:adoptId': 'AdoptController.deleteById',
   'POST /api/adopt/create': 'AdoptController.create',
   'GET /api/adopt/:adoptId/comment/list': 'AdoptController.getCommentList',
   'POST /api/adopt/:adoptId/comment/create': 'AdoptController.createComment',

@@ -9,7 +9,7 @@
  */
 module.exports = function(req, res, next) {
   const walkerId = req.param('walkerId');
-  Walker.findOne({id: walkerId})
+  Walker.findOne({id: walkerId, deletedAt: null})
     .then(walker => {
       if (walker) {
         req.pmWalker = walker;

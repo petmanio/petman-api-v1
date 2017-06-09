@@ -1,5 +1,5 @@
 /**
- * roomExists
+ * isAdoptOwner
  *
  * @module      :: Policy
  * @description :: Simple policy to allow any authenticated user
@@ -8,13 +8,8 @@
  *
  */
 module.exports = function(req, res, next) {
-  const roomId = req.param('roomId');
-  Room.findOne({id: roomId, deletedAt: null})
-    .then(room => {
-      if (room) {
-        req.pmRoom = room;
-        return next();
-      }
-      res.notFound();
-    });
+  if (req.pmUser.id === req.pmAdopt.user) {
+    return next();
+  }
+  res.forbidden();
 };

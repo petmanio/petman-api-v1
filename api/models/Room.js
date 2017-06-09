@@ -1,5 +1,8 @@
 const Q = require('q');
-const nestedPop = require('nested-pop');
+const fs = require('fs');
+const config = sails.config;
+const path = require('path');
+
 /**
  * Room.js
  *
@@ -39,9 +42,9 @@ module.exports = {
     user: {
       model: 'User'
     },
-    isAvailable: {
-      type: 'boolean',
-      defaultsTo: true
+    deletedAt: {
+      type: 'datetime',
+      defaultsTo: null
     }
   },
 
@@ -49,10 +52,10 @@ module.exports = {
     // TODO: find more right way
     let roomsCount = 0;
 
-    return Room.count()
+    return Room.count({deletedAt: null})
       .then(count => {
         roomsCount = count;
-        return Room.find()
+        return Room.find({deletedAt: null})
           .populate('images')
           .populate('applications')
           .skip(skip)
@@ -89,7 +92,7 @@ module.exports = {
     // TODO: find more right way
     let room = null;
 
-    return Room.findOne({id: roomId})
+    return Room.findOne({id: roomId, deletedAt: null})
       .populate('images')
       .then(data => {
         room = data;
@@ -135,4 +138,19 @@ module.exports = {
         return room;
       });
   },
+
+  deleteById(roomId) {
+    return Room.findOne({id: roomId})
+      .populate('images')
+      .then(room => {
+        // TODO: delete images or not
+        // room.images.forEach(image => {
+        //   if (!image.src.match("://")) {
+        //     fs.unlinkSync(path.join(config.uploadDir, image.src));
+        //   }
+        // });
+        room.deletedAt = new Date();
+        return room.save();
+      })
+  }
 };

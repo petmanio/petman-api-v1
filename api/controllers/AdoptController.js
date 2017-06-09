@@ -40,8 +40,19 @@ module.exports = {
   getById(req, res, next) {
 	  return Adopt.getAdoptById(req.pmAdopt.id)
       .then(adopt => {
+        if (req.pmUser) {
+          adopt.isOwner = adopt.user.id === req.pmUser.id;
+        } else {
+          adopt.isOwner = false;
+        }
         res.json(adopt)
       })
+      .catch(next)
+  },
+
+  deleteById(req, res, next) {
+    Adopt.deleteById(req.pmAdopt.id)
+      .then(res.ok())
       .catch(next)
   },
 

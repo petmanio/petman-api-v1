@@ -53,6 +53,12 @@ module.exports = {
       .catch(next)
   },
 
+  deleteById(req, res, next) {
+    Room.deleteById(req.pmRoom.id)
+      .then(res.ok())
+      .catch(next)
+  },
+
   apply(req, res, next) {
 	  let newApplication;
 	  let userForNotify;

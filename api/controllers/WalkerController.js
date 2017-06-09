@@ -42,6 +42,12 @@ module.exports = {
       .catch(next)
   },
 
+  deleteById(req, res, next) {
+    Walker.deleteById(req.pmWalker.id)
+      .then(res.ok())
+      .catch(next)
+  },
+
   apply(req, res, next) {
 	  let newApplication;
     let userForNotify;

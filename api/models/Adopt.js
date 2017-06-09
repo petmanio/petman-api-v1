@@ -36,10 +36,10 @@ module.exports = {
     // TODO: find more right way
     let listCount = 0;
 
-    return Adopt.count()
+    return Adopt.count({deletedAt: null})
       .then(count => {
         listCount = count;
-        return Adopt.find()
+        return Adopt.find({deletedAt: null})
           .populate('images')
           .skip(skip)
           .limit(limit)
@@ -75,7 +75,7 @@ module.exports = {
     // TODO: find more right way
     let adopt = null;
 
-    return Adopt.findOne({id: adoptId})
+    return Adopt.findOne({id: adoptId, deletedAt: null})
       .populate('images')
       .then(data => {
         adopt = data;
@@ -89,4 +89,19 @@ module.exports = {
         return adopt;
       });
   },
+
+  deleteById(roomId) {
+    return Adopt.findOne({id: roomId})
+      .populate('images')
+      .then(adopt => {
+        // TODO: delete images or not
+        // adopt.images.forEach(image => {
+        //   if (!image.src.match("://")) {
+        //     fs.unlinkSync(path.join(config.uploadDir, image.src));
+        //   }
+        // });
+        adopt.deletedAt = new Date();
+        return adopt.save();
+      })
+  }
 };

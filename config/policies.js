@@ -45,6 +45,7 @@ module.exports.policies = {
   RoomController: {
     'create': ['tokenAuth'],
     'getById': ['getUser', 'roomExists'],
+    'deleteById': ['getUser', 'roomExists', 'isRoomOwner'],
     'apply': ['tokenAuth', 'roomExists', 'canApplyForRoom'],
     'updateApplication': ['tokenAuth', 'roomApplicationExists', 'isRoomApplicationMember'],
     'getApplicationMessageList': ['tokenAuth', 'roomApplicationExists', 'isRoomApplicationMember'],
@@ -54,6 +55,7 @@ module.exports.policies = {
   WalkerController: {
     'create': ['tokenAuth'],
     'getById': ['getUser', 'walkerExists'],
+    'deleteById': ['getUser', 'walkerExists', 'isWalkerOwner'],
     'apply': ['tokenAuth', 'walkerExists', 'canApplyForWalker'],
     'updateApplication': ['tokenAuth', 'walkerApplicationExists', 'isWalkerApplicationMember'],
     'getApplicationMessageList': ['tokenAuth', 'walkerApplicationExists', 'isWalkerApplicationMember'],
@@ -62,7 +64,8 @@ module.exports.policies = {
 
   AdoptController: {
     'create': ['tokenAuth'],
-    'getById': ['adoptExists'],
+    'getById': ['getUser', 'adoptExists'],
+    'deleteById': ['getUser', 'adoptExists', 'isAdoptOwner'],
     'getCommentList': ['adoptExists'],
     'joinComment': ['adoptExists'],
     'createComment': ['tokenAuth', 'adoptExists']

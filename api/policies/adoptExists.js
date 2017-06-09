@@ -9,7 +9,7 @@
  */
 module.exports = function(req, res, next) {
   const adoptId = req.param('adoptId');
-  Adopt.findOne({id: adoptId})
+  Adopt.findOne({id: adoptId, deletedAt: null})
     .then(adopt => {
       if (adopt) {
         req.pmAdopt = adopt;

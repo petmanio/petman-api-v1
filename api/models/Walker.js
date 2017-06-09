@@ -34,9 +34,9 @@ module.exports = {
     user: {
       model: 'User'
     },
-    isAvailable: {
-      type: 'boolean',
-      defaultsTo: true
+    deletedAt: {
+      type: 'datetime',
+      defaultsTo: null
     }
   },
 
@@ -44,10 +44,10 @@ module.exports = {
     // TODO: find more right way
     let walkersCount = 0;
 
-    return Walker.count()
+    return Walker.count({deletedAt: null})
       .then(count => {
         walkersCount = count;
-        return Walker.find()
+        return Walker.find({deletedAt: null})
           .populate('applications')
           .skip(skip)
           .limit(limit)
@@ -83,7 +83,7 @@ module.exports = {
     // TODO: find more right way
     let walker = null;
 
-    return Walker.findOne({id: walkerId})
+    return Walker.findOne({id: walkerId, deletedAt: null})
       .then(data => {
         walker = data;
         return User.findOne({id: walker.user})
@@ -128,4 +128,12 @@ module.exports = {
         return walker;
       });
   },
+
+  deleteById(roomId) {
+    return Walker.findOne({id: roomId})
+      .then(walker => {
+        walker.deletedAt = new Date();
+        return walker.save();
+      })
+  }
 };
