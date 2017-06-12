@@ -33,7 +33,7 @@ module.exports.routes = {
   *                                                                          *
   ***************************************************************************/
 
-  '/': (req, res) => {
+  'GET /api/versiom': (req, res) => {
     res.json({
       name: petmanApi.name,
       version: petmanApi.version
@@ -89,7 +89,9 @@ module.exports.routes = {
   'GET /api/lost-found/:lostFoundId/comment/join': 'LostFoundController.joinComment',
 
   'GET /api/notification/list': 'NotificationController.list',
-  'PUT /api/notification/seen': 'NotificationController.seen'
+  'PUT /api/notification/seen': 'NotificationController.seen',
+  'GET *': 'ClientController.index',
+
   /***************************************************************************
   *                                                                          *
   * Custom routes here...                                                    *
