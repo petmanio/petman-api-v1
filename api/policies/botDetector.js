@@ -80,9 +80,27 @@ module.exports = function(req, res, next) {
           return _.extend(defaultContext, context);
         });
     }
+  },  {
+    pattern: new UrlPattern('/lost-found/:lostFoundId/details'),
+    template: 'lost-found-details',
+    contextFn: (patterns) => {
+      return LostFound.findOne({ id: patterns.lostFoundId })
+        .populate('images')
+        .then(lostFound => {
+          let context;
+          if (lostFound) {
+            lostFound = lostFound.toJSON();
+            context = {
+              // TODO: use host from config file
+              url: `https://petman.io/lost-found/${patterns.lostFoundId}/details`,
+              image: (lostFound.images.length && lostFound.images[0].src),
+              description: lostFound.description
+            }
+          }
+          return _.extend(defaultContext, context);
+        });
+    }
   }];
-
-  // req.headers['user-agent'] = 'facebookexternalhit';
 
   if (regexp.test(req.headers['user-agent'])) {
     const templateConfig = templatesByUrlRegexp.find(config => config.pattern.match(req.originalUrl));
