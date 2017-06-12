@@ -25,7 +25,8 @@ module.exports.http = {
 
   customMiddleware: (app) => {
     // TODO: use const
-    app.use('/upload',express.static(path.join(__dirname, '../upload')));
+    app.use('/upload', express.static(path.join(__dirname, '../upload')));
+    app.use('/', express.static(path.join(__dirname, '../client')));
   },
 
   middleware: {
