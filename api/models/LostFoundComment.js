@@ -9,6 +9,7 @@ const Q = require('q');
 module.exports = {
   tableName: 'lost_found_comment',
   attributes: {
+    // rename field to text
     comment: {
       type: 'string',
       required: true

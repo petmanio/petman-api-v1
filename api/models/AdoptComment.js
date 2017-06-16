@@ -9,6 +9,7 @@ const Q = require('q');
 module.exports = {
   tableName: 'adopt_comment',
   attributes: {
+    // rename field to text
     comment: {
       type: 'string',
       required: true
