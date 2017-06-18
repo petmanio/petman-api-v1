@@ -96,7 +96,7 @@ module.exports = {
         return AdoptComment.find({ select: ['user'], adopt: req.pmAdopt.id });
       })
       .then(userComments => {
-        const userIds = _(userComments).map('user').uniqBy().value();
+        const userIds = _(userComments).map('user').concat(req.pmAdopt.user).uniqBy().value();
         return User.find({select: ['id', 'socketId'], id: userIds});
       })
       .then(userToUpdate => {
