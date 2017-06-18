@@ -67,7 +67,7 @@ module.exports.routes = {
   'GET /api/walker/:walkerId': 'WalkerController.getById',
   'DELETE /api/walker/:walkerId': 'WalkerController.deleteById',
   'POST /api/walker/create': 'WalkerController.create',
-  'POST /api/walker/:walkerId/apply': 'WalkerController.apply',
+  'POST /api/walker/:walkerId/appl0y': 'WalkerController.apply',
   'PUT /api/walker/application/:applicationId': 'WalkerController.updateApplication',
   'GET /api/walker/application/:applicationId/message/list': 'WalkerController.getApplicationMessageList',
   'POST /api/walker/application/:applicationId/message/create': 'WalkerController.createApplicationMessage',
@@ -87,6 +87,11 @@ module.exports.routes = {
   'GET /api/lost-found/:lostFoundId/comment/list': 'LostFoundController.getCommentList',
   'POST /api/lost-found/:lostFoundId/comment/create': 'LostFoundController.createComment',
   'GET /api/lost-found/:lostFoundId/comment/join': 'LostFoundController.joinComment',
+
+  'GET /api/question/list': 'QuestionController.list',
+  'GET /api/question/:questionId': 'QuestionController.getById',
+  'DELETE /api/question/:questionId': 'QuestionController.deleteById',
+  'POST /api/question/create': 'QuestionController.create',
 
   'GET /api/notification/list': 'NotificationController.list',
   'PUT /api/notification/seen': 'NotificationController.seen',
