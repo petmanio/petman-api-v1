@@ -97,7 +97,7 @@ module.exports = {
         return LostFoundComment.find({ select: ['user'], lostFound: req.pmLostFound.id });
       })
       .then(userComments => {
-        const userIds = _(userComments).map('user').uniqBy().value();
+        const userIds = _(userComments).map('user').concat(req.pmLostFound.user).uniqBy().value();
         return User.find({select: ['id', 'socketId'], id: userIds});
       })
       .then(userToUpdate => {

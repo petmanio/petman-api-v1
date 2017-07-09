@@ -8,8 +8,8 @@ const Q = require('q');
 // TODO: add required options
 // TODO: add pet type
 module.exports = {
+  tableName: 'lost_found',
   attributes: {
-    tableName: 'lost_found',
     description: {
       type: 'string',
       required: true
