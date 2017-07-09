@@ -88,10 +88,10 @@ module.exports.routes = {
   'POST /api/lost-found/:lostFoundId/comment/create': 'LostFoundController.createComment',
   'GET /api/lost-found/:lostFoundId/comment/join': 'LostFoundController.joinComment',
 
-  'GET /api/question/list': 'QuestionController.list',
-  'GET /api/question/:questionId': 'QuestionController.getById',
-  'DELETE /api/question/:questionId': 'QuestionController.deleteById',
-  'POST /api/question/create': 'QuestionController.create',
+  // 'GET /api/question/list': 'QuestionController.list',
+  // 'GET /api/question/:questionId': 'QuestionController.getById',
+  // 'DELETE /api/question/:questionId': 'QuestionController.deleteById',
+  // 'POST /api/question/create': 'QuestionController.create',
 
   'GET /api/notification/list': 'NotificationController.list',
   'PUT /api/notification/seen': 'NotificationController.seen',
