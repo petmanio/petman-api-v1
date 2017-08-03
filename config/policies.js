@@ -45,9 +45,11 @@ module.exports.policies = {
   RoomController: {
     'create': ['tokenAuth'],
     'getById': ['getUser', 'roomExists'],
+    'getApplicationList': ['getUser', 'roomExists'],
     'deleteById': ['getUser', 'roomExists', 'isRoomOwner'],
     'apply': ['tokenAuth', 'roomExists', 'canApplyForRoom'],
     'updateApplication': ['tokenAuth', 'roomApplicationExists', 'isRoomApplicationMember'],
+    'updateApplicationStatus': ['tokenAuth', 'roomApplicationExists', 'isRoomApplicationMember'],
     'getApplicationMessageList': ['tokenAuth', 'roomApplicationExists', 'isRoomApplicationMember'],
     'createApplicationMessage': ['tokenAuth', 'roomApplicationExists', 'isRoomApplicationMember']
   },

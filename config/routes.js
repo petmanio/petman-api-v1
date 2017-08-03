@@ -54,12 +54,13 @@ module.exports.routes = {
   'GET /api/location/pins': 'LocationController.pins',
   'GET /api/location/filters': 'LocationController.filters',
 
-  'GET /api/room/list': 'RoomController.list',
   'GET /api/room/:roomId': 'RoomController.getById',
+  'GET /api/room/:roomId/applications': 'RoomController.getApplicationList',
+  'GET /api/room/list': 'RoomController.list',
   'DELETE /api/room/:roomId': 'RoomController.deleteById',
   'POST /api/room/create': 'RoomController.create',
   'POST /api/room/:roomId/apply': 'RoomController.apply',
-  'PUT /api/room/application/:applicationId': 'RoomController.updateApplication',
+  'PUT /api/room/application/:applicationId/status': 'RoomController.updateApplicationStatus',
   'GET /api/room/application/:applicationId/message/list': 'RoomController.getApplicationMessageList',
   'POST /api/room/application/:applicationId/message/create': 'RoomController.createApplicationMessage',
 

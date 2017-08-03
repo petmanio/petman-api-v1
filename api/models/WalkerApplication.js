@@ -38,13 +38,13 @@ module.exports = {
     status: {
       type: 'string',
       enum: [
-        'IN_PROGRESS',
+        'WAITING',
         'CANCELED_BY_PROVIDER',
         'CANCELED_BY_CONSUMER',
-        'CONFIRMED',
+        'IN_PROGRESS',
         'FINISHED'
       ],
-      defaultsTo: 'IN_PROGRESS'
+      defaultsTo: 'WAITING'
     },
     // TODO: functionality for future
     // startedAt: {

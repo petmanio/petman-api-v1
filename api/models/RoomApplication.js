@@ -5,17 +5,14 @@
  * @docs        :: http://sailsjs.org/documentation/concepts/models-and-orm/models
  */
 // TODO: add required options
+const _ = require('lodash');
+const nestedPop = require('nested-pop');
 module.exports = {
   tableName: 'room_application',
   attributes: {
     rating: {
       type: 'integer',
     },
-    // TODO: functionality for future
-    // count: {
-    //   type: 'integer',
-    //   required: true
-    // },
     review: {
       type: 'string'
     },
@@ -31,26 +28,17 @@ module.exports = {
       model: 'Room',
       required: true
     },
-    messages: {
-      collection: 'RoomApplicationMessage',
-      via: 'application'
-    },
     status: {
       type: 'string',
       enum: [
-        'IN_PROGRESS',
+        'WAITING',
         'CANCELED_BY_PROVIDER',
         'CANCELED_BY_CONSUMER',
-        'CONFIRMED',
+        'IN_PROGRESS',
         'FINISHED'
       ],
-      defaultsTo: 'IN_PROGRESS'
+      defaultsTo: 'WAITING'
     },
-    // TODO: functionality for future
-    // startedAt: {
-    //   type: 'datetime',
-    //   required: true
-    // },
     finishedAt: {
       type: 'datetime',
       defaultsTo: null
@@ -59,6 +47,42 @@ module.exports = {
       type: 'datetime',
       defaultsTo: null
     }
+  },
+
+  getApplicationList(roomId, userId = null) {
+    let total = 0;
+    return RoomApplication.count()
+      .where({
+        room: roomId,
+        or : [
+          { consumer: userId },
+          { provider: userId },
+          { status: 'FINISHED' }
+        ]
+      })
+      .then(count => {
+        total = count;
+        return RoomApplication
+          .find()
+          .where({
+            room: roomId,
+            or : [
+              { consumer: userId },
+              { provider: userId },
+              { status: 'FINISHED' }
+            ]
+          })
+          .populate('consumer')
+          .populate('provider')
+          .sort({createdAt: 'desc'})
+          .then(reviews => nestedPop(reviews, {
+            consumer: {as: 'user', populate: ['userData']},
+            provider: {as: 'user', populate: ['userData']},
+          }));
+      })
+      .then(list => {
+        return { total, list };
+      });
   }
 };
 
