@@ -67,7 +67,7 @@ module.exports.routes = {
   'GET /api/walker/:walkerId': 'WalkerController.getById',
   'DELETE /api/walker/:walkerId': 'WalkerController.deleteById',
   'POST /api/walker/create': 'WalkerController.create',
-  'POST /api/walker/:walkerId/appl0y': 'WalkerController.apply',
+  'POST /api/walker/:walkerId/apply': 'WalkerController.apply',
   'PUT /api/walker/application/:applicationId': 'WalkerController.updateApplication',
   'GET /api/walker/application/:applicationId/message/list': 'WalkerController.getApplicationMessageList',
   'POST /api/walker/application/:applicationId/message/create': 'WalkerController.createApplicationMessage',
@@ -95,6 +95,11 @@ module.exports.routes = {
 
   'GET /api/notification/list': 'NotificationController.list',
   'PUT /api/notification/seen': 'NotificationController.seen',
+
+  'GET /api/message/user/:userEntityId/conversation': 'MessageController.getConversation',
+  'GET /api/message/conversations': 'MessageController.getConversations',
+  'POST /api/massage/user/:userEntityId/create': 'MessageController.create',
+
   'GET *': 'ClientController.index',
 
   /***************************************************************************

@@ -10,5 +10,16 @@ module.exports = {
         resolve(uploadedFiles);
       });
     });
+  },
+
+  messageQueryAsync(query) {
+    return new Promise((resolve, reject) => {
+      Message.query(query, (err, result) => {
+        if (err) {
+          return reject(err);
+        }
+        resolve(result);
+      });
+    });
   }
 };

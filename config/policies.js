@@ -81,6 +81,12 @@ module.exports.policies = {
     'createComment': ['tokenAuth', 'lostFoundExists']
   },
 
+  MessageController: {
+    'create': ['tokenAuth', 'userEntityExists'],
+    'getConversation': ['tokenAuth', 'userEntityExists'],
+    'getConversations': ['tokenAuth']
+  },
+
   ClientController: {
     'index': ['botDetector'],
   },
