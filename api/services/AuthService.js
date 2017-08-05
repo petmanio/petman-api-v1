@@ -68,6 +68,7 @@ module.exports = {
   },
 
   signUserId(id) {
+    console.log(jwt.sign({ id: 2 }, sails.config.session.secret))
     return new Promise((resolve, reject) => {
       try {
         resolve(jwt.sign({ id }, sails.config.session.secret))

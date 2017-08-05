@@ -1,10 +1,12 @@
-const Q = require('q');
 /**
  * Notification.js
  *
  * @description :: TODO: You might write a short summary of how this model works and what it represents here.
  * @docs        :: http://sailsjs.org/documentation/concepts/models-and-orm/models
  */
+const Q = require('q');
+const nestedPop = require('nested-pop');
+
 // TODO: add required options
 // TODO: update model for not using oneToOne relations
 module.exports = {
@@ -24,8 +26,8 @@ module.exports = {
     roomApplicationStatusUpdate: {
       model: 'NotificationRoomApplicationStatusUpdate'
     },
-    roomApplicationMessageCreate: {
-      model: 'NotificationRoomApplicationMessageCreate'
+    roomApplicationRate: {
+      model: 'NotificationRoomApplicationRate'
     },
     walkerApplicationCreate: {
       model: 'NotificationWalkerApplicationCreate'
@@ -57,9 +59,10 @@ module.exports = {
         notificationsCount = count;
         return Notification.find({to: userId})
           .sort({createdAt: 'desc'})
+          .populate('from')
           .populate('roomApplicationCreate')
           .populate('roomApplicationStatusUpdate')
-          .populate('roomApplicationMessageCreate')
+          .populate('roomApplicationRate')
           .populate('walkerApplicationCreate')
           .populate('walkerApplicationStatusUpdate')
           .populate('walkerApplicationMessageCreate')
@@ -67,24 +70,9 @@ module.exports = {
           .populate('lostFoundCommentCreate')
           .skip(skip)
           .limit(limit)
-      })
-      .then(notifications => {
-        const promises = [];
-        notifications.forEach(notification => {
-          const deferred = Q.defer();
-          promises.push(deferred.promise);
-          User.findOne({id: notification.from})
-            .populate('userData')
-            .then(user => {
-              notification = notification.toJSON();
-              user = user.toJSON();
-              notification.from = user;
-              deferred.resolve(notification);
-            })
-            .catch(deferred.reject);
-        });
-
-        return Q.all(promises);
+          .then(notification => nestedPop(notification, {
+            from: {as: 'user', populate: ['userData']}
+          }));
       })
       .then((list) => {
         return {

@@ -38,7 +38,10 @@ module.exports = {
           .populate('user')
           .then(room => nestedPop(room, { user: ['userData'] }))
       })
-      .then(room => res.ok(room.toJSON()))
+      .then(room => {
+        room.isOwner = true;
+        res.ok(room);
+      })
       .catch(err => {
         uploadedImages.forEach(image => fs.unlink(image.fd));
         next(err)
@@ -80,7 +83,7 @@ module.exports = {
 
   apply(req, res, next) {
 	  let newApplication;
-	  let userForNotify;
+	  let userToNotify;
 	  RoomApplication.findOrCreate({
       consumer: req.pmUser.id,
       provider: req.pmRoom.user,
@@ -88,22 +91,24 @@ module.exports = {
       status: 'WAITING'
     })
       .then(application => {
-        newApplication = application;
-        return User.findOne({id: application.consumer})
-          .populate('userData');
+        return RoomApplication.findOne({id: application.id})
+          .populate('consumer')
+          .populate('provider')
+          .sort({createdAt: 'desc'})
+          .then(reviews => nestedPop(reviews, {
+            consumer: {as: 'user', populate: ['userData']},
+            provider: {as: 'user', populate: ['userData']},
+          }));
       })
-      .then(consumer => {
-        newApplication = newApplication.toJSON();
-        newApplication.consumer = consumer;
-        return User.findOne({
-          id: newApplication.provider
-        });
+      .then(application => {
+        newApplication = application;
+        return User.findOne(application.provider.id);
       })
       .then(data => {
-        userForNotify = data;
+        userToNotify = data;
         return Notification.create({
           from: req.pmUser.id,
-          to: userForNotify.id,
+          to: userToNotify.id,
           roomApplicationCreate: {
             room: newApplication.room,
             application: newApplication.id
@@ -112,22 +117,15 @@ module.exports = {
           .then(notification => {
             return Notification.findOne({id: notification.id})
               .populate('roomApplicationCreate')
-              .populate('roomApplicationStatusUpdate')
-              .populate('roomApplicationMessageCreate');
+              .populate('from')
+              .then(notification => nestedPop(notification, {
+                from: {as: 'user', populate: ['userData']}
+              }));
           });
       })
       .then((notification) => {
-	      return User.findOne({id: notification.from})
-          .populate('userData')
-          .then(user => {
-            notification = notification.toJSON();
-            notification.from = user;
-            return notification;
-          })
-      })
-      .then(notification => {
-        sails.sockets.broadcast(userForNotify.socketId, 'notificationNew', notification);
-        sails.sockets.broadcast(userForNotify.socketId, 'roomApplicationCreate', newApplication);
+        sails.sockets.broadcast(userToNotify.socketId, 'notificationNew', notification);
+        sails.sockets.broadcast(userToNotify.socketId, 'roomApplicationCreate', newApplication);
         res.json(newApplication);
       })
       .catch(next);
@@ -197,78 +195,59 @@ module.exports = {
       .catch(next);
   },
 
-  getApplicationMessageList(req, res, next) {
-	  RoomApplicationMessage.getList(req.pmRoomApplication.id)
-      .then(messages=> {
-        res.json(messages)
-      })
-      .catch(next);
-  },
+  rateApplication(req, res, next) {
+    // TODO: add validations messaged
+    let userToNotify;
 
-  createApplicationMessage(req, res, next) {
-	  // TODO: application status validation
-    let message;
-    RoomApplicationMessage.create({
-      from: req.pmUser.id,
-      to: req.pmRoomApplication.consumer === req.pmUser.id ?
-        req.pmRoomApplication.provider : req.pmRoomApplication.consumer,
-      room: req.pmRoomApplication.room,
-      message: req.body.message,
-      application: req.pmRoomApplication.id
-    })
-      .then(message => {
-        message = message.toJSON();
-        const deferred = Q.defer();
-        User.findOne({id: message.to})
-          .populate('userData')
-          .then(user => {
-            message.to = user;
-            deferred.resolve(message);
-          })
-          .catch(deferred.reject);
+    // TODO: use policy
+    if (req.pmRoomApplication.consumer !== req.pmUser.id) {
+      return res.badRequest();
+    }
 
-        return deferred.promise;
-      })
-      .then(message => {
-        const deferred = Q.defer();
-        User.findOne({id: message.from})
-          .populate('userData')
-          .then(user => {
-            message.from = user;
-            deferred.resolve(message);
-          })
-          .catch(deferred.reject);
+    if (req.body.status === req.pmRoomApplication.status) {
+      return res.ok();
+    }
 
-        return deferred.promise;
+    req.pmRoomApplication.rating = req.body.rating;
+    req.pmRoomApplication.review = req.body.review;
+    req.pmRoomApplication.save()
+      .then(() => {
+        return User.findOne({
+          id: req.pmRoomApplication.provider
+        });
       })
-      .then(data => {
-        message = data;
+      .then(user => {
+        userToNotify = user;
         return Notification.create({
           from: req.pmUser.id,
-          to: message.to.id,
-          roomApplicationMessageCreate: {
+          to: userToNotify.id,
+          roomApplicationRate: {
             room: req.pmRoomApplication.room,
             application: req.pmRoomApplication.id,
-            message: message.id,
+            rating: req.pmRoomApplication.rating,
+            review: req.pmRoomApplication.review
           }
-        })
-          .then(notification => {
-            return Notification.findOne({id: notification.id})
-              .populate('roomApplicationMessageCreate');
-          });
+        });
       })
       .then(notification => {
-        notification = notification.toJSON();
-        notification.from = message.from;
-
-        // TODO: only send new message to receiver using socket
-        sails.sockets.broadcast([message.from.socketId, message.to.socketId].filter(Boolean),
-          'roomApplicationMessage', message);
-
-        sails.sockets.broadcast(message.to.socketId, 'notificationNew', notification);
+        return Notification.findOne({id: notification.id})
+          .populate('roomApplicationRate')
+          .populate('from')
+          .then(notification => nestedPop(notification, {
+            from: {as: 'user', populate: ['userData']}
+          }));
+      })
+      .then(notification => {
+        sails.sockets.broadcast(userToNotify.socketId, 'notificationNew', notification);
+        sails.sockets.broadcast(userToNotify.socketId, 'roomApplicationRate', {
+          roomId: req.pmRoomApplication.room,
+          applicationId: req.pmRoomApplication.id,
+          rating: req.pmRoomApplication.rating,
+          review: req.pmRoomApplication.review
+        });
         res.ok();
       })
-      .catch(next)
+      .catch(next);
   }
 };
 

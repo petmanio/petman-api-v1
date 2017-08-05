@@ -61,8 +61,7 @@ module.exports.routes = {
   'POST /api/room/create': 'RoomController.create',
   'POST /api/room/:roomId/apply': 'RoomController.apply',
   'PUT /api/room/application/:applicationId/status': 'RoomController.updateApplicationStatus',
-  'GET /api/room/application/:applicationId/message/list': 'RoomController.getApplicationMessageList',
-  'POST /api/room/application/:applicationId/message/create': 'RoomController.createApplicationMessage',
+  'PUT /api/room/application/:applicationId/rate': 'RoomController.rateApplication',
 
   'GET /api/walker/list': 'WalkerController.list',
   'GET /api/walker/:walkerId': 'WalkerController.getById',

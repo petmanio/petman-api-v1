@@ -50,8 +50,7 @@ module.exports.policies = {
     'apply': ['tokenAuth', 'roomExists', 'canApplyForRoom'],
     'updateApplication': ['tokenAuth', 'roomApplicationExists', 'isRoomApplicationMember'],
     'updateApplicationStatus': ['tokenAuth', 'roomApplicationExists', 'isRoomApplicationMember'],
-    'getApplicationMessageList': ['tokenAuth', 'roomApplicationExists', 'isRoomApplicationMember'],
-    'createApplicationMessage': ['tokenAuth', 'roomApplicationExists', 'isRoomApplicationMember']
+    'rateApplication': ['tokenAuth', 'roomApplicationExists', 'isRoomApplicationMember'],
   },
 
   WalkerController: {
