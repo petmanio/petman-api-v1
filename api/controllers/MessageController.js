@@ -8,6 +8,7 @@ const nestedPop = require('nested-pop');
 
 module.exports = {
   create(req, res, next) {
+    let newMessage;
     if (!req.body.text) {
       return res.badRequest();
     }
@@ -25,7 +26,29 @@ module.exports = {
             to: {as: 'user', populate: ['userData']},
           }))
       })
-      .then(message => res.ok(message))
+      .then(message => {
+        newMessage = message;
+        return Notification.create({
+          from: req.pmUser.id,
+          to: req.pmUserEntity.id,
+          messageCreate: {
+            message: newMessage.id
+          }
+        })
+          .then(notification => {
+            return Notification.findOne({id: notification.id})
+              .populate('messageCreate')
+              .populate('from')
+              .then(notification => nestedPop(notification, {
+                from: {as: 'user', populate: ['userData']}
+              }));
+          });
+      })
+      .then((notification) => {
+        sails.sockets.broadcast(req.pmUserEntity.socketId, 'notificationNew', notification);
+        sails.sockets.broadcast(req.pmUserEntity.socketId, 'messageCreate', newMessage);
+        res.json(newMessage);
+      })
       .catch(next);
   },
 	getConversations(req, res, next) {

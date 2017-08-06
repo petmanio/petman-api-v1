@@ -44,6 +44,9 @@ module.exports = {
     lostFoundCommentCreate: {
       model: 'NotificationLostFoundCommentCreate'
     },
+    messageCreate: {
+      model: 'NotificationMessageCreate'
+    },
     seen: {
       type: 'boolean',
       defaultsTo: false
@@ -68,6 +71,7 @@ module.exports = {
           .populate('walkerApplicationMessageCreate')
           .populate('adoptCommentCreate')
           .populate('lostFoundCommentCreate')
+          .populate('messageCreate')
           .skip(skip)
           .limit(limit)
           .then(notification => nestedPop(notification, {
