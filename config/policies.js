@@ -56,11 +56,12 @@ module.exports.policies = {
   WalkerController: {
     'create': ['tokenAuth'],
     'getById': ['getUser', 'walkerExists'],
+    'getApplicationList': ['getUser', 'walkerExists'],
     'deleteById': ['getUser', 'walkerExists', 'isWalkerOwner'],
     'apply': ['tokenAuth', 'walkerExists', 'canApplyForWalker'],
     'updateApplication': ['tokenAuth', 'walkerApplicationExists', 'isWalkerApplicationMember'],
-    'getApplicationMessageList': ['tokenAuth', 'walkerApplicationExists', 'isWalkerApplicationMember'],
-    'createApplicationMessage': ['tokenAuth', 'walkerApplicationExists', 'isWalkerApplicationMember']
+    'updateApplicationStatus': ['tokenAuth', 'walkerApplicationExists', 'isWalkerApplicationMember'],
+    'rateApplication': ['tokenAuth', 'walkerApplicationExists', 'isWalkerApplicationMember'],
   },
 
   AdoptController: {

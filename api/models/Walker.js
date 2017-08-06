@@ -1,5 +1,8 @@
 const Q = require('q');
-const nestedPop = require('nested-pop');
+const fs = require('fs');
+const config = sails.config;
+const path = require('path');
+
 /**
  * Walker.js
  *
@@ -10,10 +13,6 @@ const nestedPop = require('nested-pop');
 // TODO: add pet type
 module.exports = {
   attributes: {
-    // name: {
-    //   type: 'string',
-    //   required: true
-    // },
     description: {
       type: 'string',
       required: true
@@ -22,11 +21,6 @@ module.exports = {
       type: 'float',
       required: true
     },
-    // TODO: functionality for future
-    // limit: {
-    //   type: 'integer',
-    //   required: true
-    // },
     applications: {
       collection: 'WalkerApplication',
       via: 'walker'
@@ -37,100 +31,17 @@ module.exports = {
     deletedAt: {
       type: 'datetime',
       defaultsTo: null
+    },
+
+    toJSON() {
+      const obj = this.toObject();
+      delete obj.deletedAt;
+      return obj;
     }
   },
 
-  getList(skip = 0, limit = 10) {
-    // TODO: find more right way
-    let walkersCount = 0;
-
-    return Walker.count({deletedAt: null})
-      .then(count => {
-        walkersCount = count;
-        return Walker.find({deletedAt: null})
-          .populate('applications')
-          .skip(skip)
-          .limit(limit)
-          .sort({createdAt: 'desc'});
-      })
-      .then(walkers => {
-        const promises = [];
-        walkers.forEach(walker => {
-          const deferred = Q.defer();
-          promises.push(deferred.promise);
-          User.findOne({id: walker.user})
-            .populate('userData')
-            .then(user => {
-              walker = walker.toJSON();
-              user = user.toJSON();
-              walker.user = user;
-              deferred.resolve(walker);
-            })
-            .catch(deferred.reject);
-        });
-
-        return Q.all(promises);
-      })
-      .then((list) => {
-        return {
-          count: walkersCount,
-          list: list
-        }
-      });
-  },
-
-  getWalkerById(walkerId, userId = null) {
-    // TODO: find more right way
-    let walker = null;
-
-    return Walker.findOne({id: walkerId, deletedAt: null})
-      .then(data => {
-        walker = data;
-        return User.findOne({id: walker.user})
-          .populate('userData')
-      })
-      .then(user => {
-        walker = walker.toJSON();
-        user = user.toJSON();
-        walker.user = user;
-        return WalkerApplication.find({ walker: walker.id }).where(
-          {
-            or : [
-              { consumer: userId },
-              { provider: userId },
-              { status: 'FINISHED' }
-            ]
-          }
-        ).sort({createdAt: 'desc'});
-      })
-      .then(applications => {
-        let promises = [];
-
-        applications.forEach(application => {
-          let deferred = Q.defer();
-          promises.push(deferred.promise);
-
-          User.findOne({id: application.consumer})
-            .populate('userData')
-            .then(user => {
-              user = user.toJSON();
-              application.consumer = user;
-
-              deferred.resolve(application);
-            })
-            .catch(deferred.reject);
-        });
-
-        return Q.all(promises);
-      })
-      .then(applications => {
-        walker.applications = applications;
-        return walker;
-      });
-  },
-
-  deleteById(roomId) {
-    return Walker.findOne({id: roomId})
+  deleteById(walkerId) {
+    return Walker.findOne({id: walkerId})
       .then(walker => {
         walker.deletedAt = new Date();
         return walker.save();

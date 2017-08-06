@@ -63,14 +63,14 @@ module.exports.routes = {
   'PUT /api/room/application/:applicationId/status': 'RoomController.updateApplicationStatus',
   'PUT /api/room/application/:applicationId/rate': 'RoomController.rateApplication',
 
-  'GET /api/walker/list': 'WalkerController.list',
   'GET /api/walker/:walkerId': 'WalkerController.getById',
+  'GET /api/walker/:walkerId/applications': 'WalkerController.getApplicationList',
+  'GET /api/walker/list': 'WalkerController.list',
   'DELETE /api/walker/:walkerId': 'WalkerController.deleteById',
   'POST /api/walker/create': 'WalkerController.create',
   'POST /api/walker/:walkerId/apply': 'WalkerController.apply',
-  'PUT /api/walker/application/:applicationId': 'WalkerController.updateApplication',
-  'GET /api/walker/application/:applicationId/message/list': 'WalkerController.getApplicationMessageList',
-  'POST /api/walker/application/:applicationId/message/create': 'WalkerController.createApplicationMessage',
+  'PUT /api/walker/application/:applicationId/status': 'WalkerController.updateApplicationStatus',
+  'PUT /api/walker/application/:applicationId/rate': 'WalkerController.rateApplication',
 
   'GET /api/adopt/list': 'AdoptController.list',
   'GET /api/adopt/:adoptId': 'AdoptController.getById',

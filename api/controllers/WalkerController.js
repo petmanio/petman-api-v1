@@ -9,12 +9,11 @@ const path = require('path');
 const fs = require('fs');
 const _ = require('lodash');
 const Q = require('q');
+const nestedPop = require('nested-pop');
 
 module.exports = {
-	list(req, res, next) {
-	  Walker.getList(req.query.skip, req.query.limit)
-      .then(walker => res.ok(walker))
-      .catch(next);
+  list(req, res, next) {
+    res.ok();
   },
 
   create(req, res, next) {
@@ -25,21 +24,36 @@ module.exports = {
       limit: req.body.limit,
       user: req.pmUser
     })
-      .then(walker => res.ok(walker.toJSON()))
+      .then(walker => {
+        return Walker.findOne({id: walker.id})
+          .populate('user')
+          .then(walker => nestedPop(walker, { user: ['userData'] }))
+      })
+      .then(walker => {
+        walker.isOwner = true;
+        res.ok(walker);
+      })
       .catch(next)
   },
 
   getById(req, res, next) {
-	  return Walker.getWalkerById(req.pmWalker.id, req.pmUser && req.pmUser.id)
+    let averageRaging;
+    return WalkerApplication.findOne({walker: req.pmWalker.id})
+      .average('rating')
+      .then(result => {
+        averageRaging = result.rating;
+        return Walker.findOne({id: req.pmWalker.id})
+          .populate('user')
+      })
+      .then(walker => nestedPop(walker, { user: ['userData'] }))
       .then(walker => {
+        walker.averageRating = averageRaging;
         if (req.pmUser) {
           walker.isOwner = walker.user.id === req.pmUser.id;
-        } else {
-          walker.isOwner = false;
         }
-        res.json(walker)
+        res.ok(walker.toJSON())
       })
-      .catch(next)
+      .catch(next);
   },
 
   deleteById(req, res, next) {
@@ -48,9 +62,15 @@ module.exports = {
       .catch(next)
   },
 
+  getApplicationList(req, res, next) {
+    WalkerApplication.getApplicationList(req.pmWalker.id, req.pmUser.id)
+      .then(applications => res.ok(applications))
+      .catch(next)
+  },
+
   apply(req, res, next) {
-	  let newApplication;
-    let userForNotify;
+    let newApplication;
+    let userToNotify;
     WalkerApplication.findOrCreate({
       consumer: req.pmUser.id,
       provider: req.pmWalker.user,
@@ -58,22 +78,24 @@ module.exports = {
       status: 'WAITING'
     })
       .then(application => {
-        newApplication = application;
-        return User.findOne({id: application.consumer})
-          .populate('userData');
+        return WalkerApplication.findOne({id: application.id})
+          .populate('consumer')
+          .populate('provider')
+          .sort({createdAt: 'desc'})
+          .then(reviews => nestedPop(reviews, {
+            consumer: {as: 'user', populate: ['userData']},
+            provider: {as: 'user', populate: ['userData']},
+          }));
       })
-      .then(consumer => {
-        newApplication = newApplication.toJSON();
-        newApplication.consumer = consumer;
-        return User.findOne({
-          id: newApplication.provider
-        });
+      .then(application => {
+        newApplication = application;
+        return User.findOne(application.provider.id);
       })
       .then(data => {
-        userForNotify = data;
+        userToNotify = data;
         return Notification.create({
           from: req.pmUser.id,
-          to: userForNotify.id,
+          to: userToNotify.id,
           walkerApplicationCreate: {
             walker: newApplication.walker,
             application: newApplication.id
@@ -81,167 +103,138 @@ module.exports = {
         })
           .then(notification => {
             return Notification.findOne({id: notification.id})
-            .populate('walkerApplicationCreate')
-              .populate('walkerApplicationStatusUpdate')
-              .populate('walkerApplicationMessageCreate')
+              .populate('walkerApplicationCreate')
+              .populate('from')
+              .then(notification => nestedPop(notification, {
+                from: {as: 'user', populate: ['userData']}
+              }));
           });
       })
       .then((notification) => {
-        return User.findOne({id: notification.from})
-          .populate('userData')
-          .then(user => {
-            notification = notification.toJSON();
-            notification.from = user;
-            return notification;
-          })
-      })
-      .then(notification => {
-        sails.sockets.broadcast(userForNotify.socketId, 'notificationNew', notification);
-        sails.sockets.broadcast(userForNotify.socketId, 'walkerApplicationCreate', newApplication);
+        sails.sockets.broadcast(userToNotify.socketId, 'notificationNew', notification);
+        sails.sockets.broadcast(userToNotify.socketId, 'walkerApplicationCreate', newApplication);
         res.json(newApplication);
       })
       .catch(next);
   },
 
-  updateApplication(req, res, next) {
-	  // TODO: add validations
-    let userForNotify;
-    let notification;
+  updateApplicationStatus(req, res, next) {
+    // TODO: add validations messaged
+    let statusIsRight;
+    let userToNotifyId;
+    let userToNotify;
     let prevStatus = req.pmWalkerApplication.status;
-    if (req.pmWalkerApplication.status === 'FINISHED' &&
-      !req.pmWalkerApplication.review && req.pmWalkerApplication.provider === req.pmUser.id) {
-      return res.json(req.pmWalkerApplication);
+    if (req.body.status === req.pmWalkerApplication.status) {
+      return res.ok();
     }
 
-    function sendNewNotification() {
-      return Notification.create({
-        from: req.pmUser.id,
-        to: userForNotify.id,
-        walkerApplicationStatusUpdate: {
-          walker: req.pmWalkerApplication.walker,
-          application: req.pmWalkerApplication.id,
-          prevStatus: prevStatus,
-          currentStatus: req.pmWalkerApplication.status
-        }
-      })
-        .then(notification => {
-          return Notification.findOne({id: notification.id})
-            .populate('walkerApplicationCreate')
-            .populate('walkerApplicationStatusUpdate')
-            .populate('walkerApplicationMessageCreate');
-        })
-        .then(data => {
-          notification = data;
-          return User.findOne({id: notification.from}).populate('userData');
-        })
-        .then(user => {
-          notification = notification.toJSON();
-          user = user.toJSON();
-          notification.from = user;
-          return sails.sockets.broadcast(userForNotify.socketId, 'notificationNew', notification);
-        });
+    if (req.pmWalkerApplication.provider === req.pmUser.id) {
+      const availableStatuses = ['CANCELED_BY_PROVIDER', 'FINISHED', 'IN_PROGRESS'];
+      statusIsRight = availableStatuses.indexOf(req.body.status) !== -1;
+      userToNotifyId = req.pmWalkerApplication.consumer;
+    } else {
+      const availableStatuses = ['CANCELED_BY_CONSUMER', 'FINISHED'];
+      statusIsRight = availableStatuses.indexOf(req.body.status) !== -1;
+      userToNotifyId = req.pmWalkerApplication.provider;
+    }
+
+    if (!statusIsRight) {
+      return res.badRequest();
     }
 
     req.pmWalkerApplication.status = req.body.status;
-    if (req.pmWalkerApplication.status === 'FINISHED') {
-      req.pmWalkerApplication.finishedAt = new Date();
-      req.pmWalkerApplication.review = req.body.review;
-      req.pmWalkerApplication.rating = req.body.rating;
-    }
     req.pmWalkerApplication.save()
       .then(() => {
         return User.findOne({
-          id: req.pmWalkerApplication.provider === req.pmUser.id ? req.pmWalkerApplication.consumer : req.pmWalkerApplication.provider
+          id: userToNotifyId
         });
       })
-      .then(data => {
-        userForNotify = data;
-        if (prevStatus !== req.pmWalkerApplication.status) {
-          return sendNewNotification();
-        }
-        return null;
-      })
-      .then(() => {
-        sails.sockets.broadcast(userForNotify.socketId, 'walkerApplicationUpdate', req.pmWalkerApplication);
-        res.json(req.pmWalkerApplication);
-      })
-      .catch(next);
-  },
-
-  getApplicationMessageList(req, res, next) {
-	  WalkerApplicationMessage.getList(req.pmWalkerApplication.id)
-      .then(messages=> {
-        res.json(messages)
-      })
-      .catch(next);
-  },
-
-  createApplicationMessage(req, res, next) {
-	  // TODO: application status validation
-    let message;
-    WalkerApplicationMessage.create({
-      from: req.pmUser.id,
-      to: req.pmWalkerApplication.consumer === req.pmUser.id ?
-        req.pmWalkerApplication.provider : req.pmWalkerApplication.consumer,
-      walker: req.pmWalkerApplication.walker,
-      message: req.body.message,
-      application: req.pmWalkerApplication.id
-    })
-      .then(message => {
-        message = message.toJSON();
-        const deferred = Q.defer();
-        User.findOne({id: message.to})
-          .populate('userData')
-          .then(user => {
-            message.to = user;
-            deferred.resolve(message);
-          })
-          .catch(deferred.reject);
-
-        return deferred.promise;
-      })
-      .then(message => {
-        const deferred = Q.defer();
-        User.findOne({id: message.from})
-          .populate('userData')
-          .then(user => {
-            message.from = user;
-            deferred.resolve(message);
-          })
-          .catch(deferred.reject);
-
-        return deferred.promise;
-      })
-      .then(data => {
-        message = data;
+      .then(user => {
+        userToNotify = user;
         return Notification.create({
           from: req.pmUser.id,
-          to: message.to.id,
-          walkerApplicationMessageCreate: {
+          to: userToNotify.id,
+          walkerApplicationStatusUpdate: {
             walker: req.pmWalkerApplication.walker,
             application: req.pmWalkerApplication.id,
-            message: message.id,
+            prevStatus: prevStatus,
+            currentStatus: req.pmWalkerApplication.status
           }
-        })
-          .then(notification => {
-            return Notification.findOne({id: notification.id})
-              .populate('walkerApplicationCreate')
-              .populate('walkerApplicationStatusUpdate')
-              .populate('walkerApplicationMessageCreate');
-          })
+        });
       })
       .then(notification => {
-        notification = notification.toJSON();
-        notification.from = message.from;
-
-        sails.sockets.broadcast([message.from.socketId, message.to.socketId].filter(Boolean),
-          'walkerApplicationMessage', message);
-
-        sails.sockets.broadcast(message.to.socketId, 'notificationNew', notification);
+        return Notification.findOne({id: notification.id})
+          .populate('walkerApplicationStatusUpdate')
+          .populate('from')
+          .then(notification => nestedPop(notification, {
+            from: {as: 'user', populate: ['userData']}
+          }));
+      })
+      .then(notification => {
+        sails.sockets.broadcast(userToNotify.socketId, 'notificationNew', notification);
+        sails.sockets.broadcast(userToNotify.socketId, 'walkerApplicationStatusUpdate', {
+          walkerId: req.pmWalkerApplication.walker,
+          applicationId: req.pmWalkerApplication.id,
+          status: req.pmWalkerApplication.status
+        });
         res.ok();
       })
-      .catch(next)
+      .catch(next);
+  },
 
+  rateApplication(req, res, next) {
+    // TODO: add validations messaged
+    let userToNotify;
+
+    // TODO: use policy
+    if (req.pmWalkerApplication.consumer !== req.pmUser.id) {
+      return res.badRequest();
+    }
+
+    if (req.body.status === req.pmWalkerApplication.status) {
+      return res.ok();
+    }
+
+    req.pmWalkerApplication.rating = req.body.rating;
+    req.pmWalkerApplication.review = req.body.review;
+    req.pmWalkerApplication.save()
+      .then(() => {
+        return User.findOne({
+          id: req.pmWalkerApplication.provider
+        });
+      })
+      .then(user => {
+        userToNotify = user;
+        return Notification.create({
+          from: req.pmUser.id,
+          to: userToNotify.id,
+          walkerApplicationRate: {
+            walker: req.pmWalkerApplication.walker,
+            application: req.pmWalkerApplication.id,
+            rating: req.pmWalkerApplication.rating,
+            review: req.pmWalkerApplication.review
+          }
+        });
+      })
+      .then(notification => {
+        return Notification.findOne({id: notification.id})
+          .populate('walkerApplicationRate')
+          .populate('from')
+          .then(notification => nestedPop(notification, {
+            from: {as: 'user', populate: ['userData']}
+          }));
+      })
+      .then(notification => {
+        sails.sockets.broadcast(userToNotify.socketId, 'notificationNew', notification);
+        sails.sockets.broadcast(userToNotify.socketId, 'walkerApplicationRate', {
+          walkerId: req.pmWalkerApplication.walker,
+          applicationId: req.pmWalkerApplication.id,
+          rating: req.pmWalkerApplication.rating,
+          review: req.pmWalkerApplication.review
+        });
+        res.ok();
+      })
+      .catch(next);
   }
 };
 

@@ -35,8 +35,8 @@ module.exports = {
     walkerApplicationStatusUpdate: {
       model: 'NotificationWalkerApplicationStatusUpdate'
     },
-    walkerApplicationMessageCreate: {
-      model: 'NotificationWalkerApplicationMessageCreate'
+    walkerApplicationRate: {
+      model: 'NotificationWalkerApplicationRate'
     },
     adoptCommentCreate: {
       model: 'NotificationAdoptCommentCreate'
@@ -68,7 +68,7 @@ module.exports = {
           .populate('roomApplicationRate')
           .populate('walkerApplicationCreate')
           .populate('walkerApplicationStatusUpdate')
-          .populate('walkerApplicationMessageCreate')
+          .populate('walkerApplicationRate')
           .populate('adoptCommentCreate')
           .populate('lostFoundCommentCreate')
           .populate('messageCreate')
