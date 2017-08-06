@@ -14,7 +14,12 @@ const nestedPop = require('nested-pop');
 module.exports = {
 	list(req, res, next) {
     Room.getList(req.query.skip, req.query.limit)
-      .then(rooms => res.ok(rooms))
+      .then(rooms => {
+        if (req.pmUser) {
+          rooms.list = rooms.list.map(room => room.isOwner = room.user.id === req.pmUser.id)
+        }
+        res.ok(rooms);
+      })
       .catch(next);
   },
 
