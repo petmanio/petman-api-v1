@@ -45,6 +45,7 @@ module.exports.policies = {
   RoomController: {
     'create': ['tokenAuth'],
     'getById': ['getUser', 'roomExists'],
+    'list': ['getUser'],
     'getApplicationList': ['getUser', 'roomExists'],
     'deleteById': ['getUser', 'roomExists', 'isRoomOwner'],
     'apply': ['tokenAuth', 'roomExists', 'canApplyForRoom'],
@@ -56,6 +57,7 @@ module.exports.policies = {
   WalkerController: {
     'create': ['tokenAuth'],
     'getById': ['getUser', 'walkerExists'],
+    'list': ['getUser'],
     'getApplicationList': ['getUser', 'walkerExists'],
     'deleteById': ['getUser', 'walkerExists', 'isWalkerOwner'],
     'apply': ['tokenAuth', 'walkerExists', 'canApplyForWalker'],

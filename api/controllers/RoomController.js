@@ -16,7 +16,10 @@ module.exports = {
     Room.getList(req.query.skip, req.query.limit)
       .then(rooms => {
         if (req.pmUser) {
-          rooms.list = rooms.list.map(room => room.isOwner = room.user.id === req.pmUser.id)
+          rooms.list = rooms.list.map(room => {
+            room.isOwner = room.user.id === req.pmUser.id;
+            return room;
+          });
         }
         res.ok(rooms);
       })

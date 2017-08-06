@@ -16,7 +16,10 @@ module.exports = {
     Walker.getList(req.query.skip, req.query.limit)
       .then(walkers => {
         if (req.pmUser) {
-          walkers.list = walkers.list.map(walker => walker.isOwner = walker.user.id === req.pmUser.id)
+          walkers.list = walkers.list.map(walker => {
+            walker.isOwner = walker.user.id === req.pmUser.id;
+            return walker;
+          });
         }
         res.ok(walkers)
       })
