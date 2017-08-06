@@ -13,7 +13,9 @@ const nestedPop = require('nested-pop');
 
 module.exports = {
   list(req, res, next) {
-    res.ok();
+    Walker.getList(req.query.skip, req.query.limit)
+      .then(walkers => res.ok(walkers))
+      .catch(next);
   },
 
   create(req, res, next) {
