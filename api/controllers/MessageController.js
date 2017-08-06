@@ -17,8 +17,15 @@ module.exports = {
       text: req.body.text
     })
       .then(message => {
-        res.ok(message);
+        return Message.findOne({id: message.id})
+          .populate('from')
+          .populate('to')
+          .then(message => nestedPop(message, {
+            from: {as: 'user', populate: ['userData']},
+            to: {as: 'user', populate: ['userData']},
+          }))
       })
+      .then(message => res.ok(message))
       .catch(next);
   },
 	getConversations(req, res, next) {
@@ -30,8 +37,15 @@ module.exports = {
   },
 
   getConversation(req, res, next) {
-    Message.getConversation(req.pmUser.id, req.pmUserEntity.id)
+    let userEntity;
+    return User.findOne({id: req.pmUserEntity.id})
+      .populate('userData')
+      .then(user => {
+        userEntity = user;
+        return Message.getConversation(req.pmUser.id, req.pmUserEntity.id);
+      })
       .then(messages => {
+        messages.userEntity = userEntity;
         res.ok(messages);
       })
       .catch(next)

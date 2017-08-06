@@ -59,7 +59,7 @@ module.exports = {
           .populate('from')
           .populate('to')
           .sort({createdAt: 'desc'})
-          .then(reviews => nestedPop(reviews, {
+          .then(messages => nestedPop(messages, {
             from: {as: 'user', populate: ['userData']},
             to: {as: 'user', populate: ['userData']},
           }));
@@ -90,7 +90,7 @@ module.exports = {
           .populate('from')
           .populate('to')
           .sort({createdAt: 'desc'})
-          .then(reviews => nestedPop(reviews, {
+          .then(messages => nestedPop(messages, {
             from: {as: 'user', populate: ['userData']},
             to: {as: 'user', populate: ['userData']},
           }));
