@@ -9,7 +9,8 @@ module.exports = {
   attributes: {
     email: {
       type: 'string',
-      required: true,
+      // TODO: when use not allowed email
+      // required: true,
       unique: true
     },
     password: {
