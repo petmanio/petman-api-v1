@@ -36,6 +36,10 @@ module.exports = {
       type: 'string',
       defaultsTo: null
     },
+    isAdmin: {
+      type: 'boolean',
+      defaultsTo: false
+    },
 
     toJSON() {
       const obj = this.toObject();

@@ -9,15 +9,7 @@ module.exports = {
   attributes: {
     source: {
       type: 'string',
-      required: true
-    },
-    icon: {
-      type: 'string',
-      defaultsTo: null
-    },
-    sourceCreatedAt: {
-      type: 'datetime',
-      defaultsTo: null
+      defaultsTo: 'local'
     },
     description: {
       type: 'string',
@@ -25,13 +17,19 @@ module.exports = {
     },
     link: {
       type: 'string',
-      defaultsTo: null,
-      unique: true
+      defaultsTo: null
     },
     thumbnail: {
       type: 'string',
       defaultsTo: null
-    }
+    },
+    content: {
+      type: 'text'
+    },
+    user: {
+      model: 'User',
+      required: true
+    },
   }
 };
 
