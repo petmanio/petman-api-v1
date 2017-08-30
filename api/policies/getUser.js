@@ -13,7 +13,9 @@ module.exports = function(req, res, next) {
   let selectedUserId;
   if (req.isSocket) {
     token = req.body['x-auth-token'];
+    selectedUserId = req.body['x-selected-user'];
     delete req.body['x-auth-token'];
+    delete req.body['x-selected-user'];
   } else {
     token = req.header('x-auth-token');
     selectedUserId = req.header('x-selected-user');

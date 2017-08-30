@@ -134,8 +134,8 @@ module.exports = {
           });
       })
       .then((notification) => {
-        sails.sockets.broadcast(userToNotify.socketId, 'notificationNew', notification);
-        sails.sockets.broadcast(userToNotify.socketId, 'roomApplicationCreate', newApplication);
+        sails.sockets.broadcast(UtilService.USER_ID_SOCKET_ID_MAP[userToNotify.id], 'notificationNew', notification);
+        sails.sockets.broadcast(UtilService.USER_ID_SOCKET_ID_MAP[userToNotify.id], 'roomApplicationCreate', newApplication);
         res.json(newApplication);
       })
       .catch(next);
@@ -194,8 +194,8 @@ module.exports = {
           }));
       })
       .then(notification => {
-        sails.sockets.broadcast(userToNotify.socketId, 'notificationNew', notification);
-        sails.sockets.broadcast(userToNotify.socketId, 'roomApplicationStatusUpdate', {
+        sails.sockets.broadcast(UtilService.USER_ID_SOCKET_ID_MAP[userToNotify.id], 'notificationNew', notification);
+        sails.sockets.broadcast(UtilService.USER_ID_SOCKET_ID_MAP[userToNotify.id], 'roomApplicationStatusUpdate', {
           roomId: req.pmRoomApplication.room,
           applicationId: req.pmRoomApplication.id,
           status: req.pmRoomApplication.status
@@ -248,8 +248,8 @@ module.exports = {
           }));
       })
       .then(notification => {
-        sails.sockets.broadcast(userToNotify.socketId, 'notificationNew', notification);
-        sails.sockets.broadcast(userToNotify.socketId, 'roomApplicationRate', {
+        sails.sockets.broadcast(UtilService.USER_ID_SOCKET_ID_MAP[userToNotify.id], 'notificationNew', notification);
+        sails.sockets.broadcast(UtilService.USER_ID_SOCKET_ID_MAP[userToNotify.id], 'roomApplicationRate', {
           roomId: req.pmRoomApplication.room,
           applicationId: req.pmRoomApplication.id,
           rating: req.pmRoomApplication.rating,

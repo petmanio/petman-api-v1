@@ -9,6 +9,7 @@ const path = require('path');
 const fs = require('fs');
 const _ = require('lodash');
 const Q = require('q');
+const nestedPop = require('nested-pop');
 
 module.exports = {
 	list(req, res, next) {
@@ -40,7 +41,7 @@ module.exports = {
   getById(req, res, next) {
 	  return Adopt.getAdoptById(req.pmAdopt.id)
       .then(adopt => {
-        if (req.pmUser) {
+        if (req.pmSelectedUser) {
           adopt.isOwner = adopt.user.id === req.pmSelectedUser.id;
         } else {
           adopt.isOwner = false;
@@ -75,7 +76,6 @@ module.exports = {
 
   createComment(req, res, next) {
 	  let comment;
-	  let usersForSendNotification;
     AdoptComment.create({
       user: req.pmSelectedUser.id,
       adopt: req.pmAdopt.id,
@@ -96,20 +96,17 @@ module.exports = {
         return AdoptComment.find({ select: ['user'], adopt: req.pmAdopt.id });
       })
       .then(userComments => {
-        const userIds = _(userComments).map('user').uniqBy().value();
-        return User.find({select: ['id', 'socketId'], id: userIds});
-      })
-      .then(userToUpdate => {
-        usersForSendNotification = _(userToUpdate).filter(user => user.id !== req.pmSelectedUser.id).value();
+        let userIds = _(userComments).map('user').concat(req.pmAdopt.user).uniqBy().value();
+        userIds = userIds.filter(userId => userId !== req.pmSelectedUser.id);
 
         // TODO: only send new message to receiver using socket
         const roomName = `adopt_comment_${req.pmAdopt.id}`;
         sails.sockets.broadcast(roomName, 'adoptComment', comment);
 
-        return Q.all(usersForSendNotification.map(user => {
+        return Q.all(userIds.map(user => {
           return Notification.create({
             from: req.pmSelectedUser.id,
-            to: user.id,
+            to: user,
             adoptCommentCreate: {
               adopt: req.pmAdopt.id,
               comment: comment.id,
@@ -125,9 +122,9 @@ module.exports = {
         notifications.forEach(notification => {
           notification = notification.toJSON();
           notification.from = comment.user;
-          const socketToEmit = _.find(usersForSendNotification, {id: notification.to});
-          if (socketToEmit && socketToEmit.socketId) {
-            sails.sockets.broadcast(socketToEmit.socketId, 'notificationNew', notification);
+          const socketId = UtilService.USER_ID_SOCKET_ID_MAP[notification.to];
+          if (socketId && socketId !== UtilService.USER_ID_SOCKET_ID_MAP[req.pmSelectedUser.id]) {
+            sails.sockets.broadcast(socketId, 'notificationNew', notification);
           }
         });
         res.ok();

@@ -9,10 +9,11 @@ const path = require('path');
 const fs = require('fs');
 const _ = require('lodash');
 const Q = require('q');
+const nestedPop = require('nested-pop');
 
 module.exports = {
-	list(req, res, next) {
-	  LostFound.getList(req.query.skip, req.query.limit)
+  list(req, res, next) {
+    LostFound.getList(req.query.skip, req.query.limit)
       .then(lostFound => res.ok(lostFound))
       .catch(next);
   },
@@ -25,10 +26,10 @@ module.exports = {
         return LostFound.create({
           description: req.body.description,
           type: req.body.type,
-          user: req.pmSelectedUser,
           images: images.map(image => {
             return { src: image.fd.replace(config.uploadDir, '') }
-          })
+          }),
+          user: req.pmSelectedUser
         });
       })
       .then(lostFound => res.ok(lostFound.toJSON()))
@@ -39,7 +40,7 @@ module.exports = {
   },
 
   getById(req, res, next) {
-	  return LostFound.getLostFoundById(req.pmLostFound.id)
+    return LostFound.getLostFoundById(req.pmLostFound.id)
       .then(lostFound => {
         if (req.pmSelectedUser) {
           lostFound.isOwner = lostFound.user.id === req.pmSelectedUser.id;
@@ -75,8 +76,7 @@ module.exports = {
   },
 
   createComment(req, res, next) {
-	  let comment;
-	  let usersForSendNotification;
+    let comment;
     LostFoundComment.create({
       user: req.pmSelectedUser.id,
       lostFound: req.pmLostFound.id,
@@ -97,20 +97,17 @@ module.exports = {
         return LostFoundComment.find({ select: ['user'], lostFound: req.pmLostFound.id });
       })
       .then(userComments => {
-        const userIds = _(userComments).map('user').uniqBy().value();
-        return User.find({select: ['id', 'socketId'], id: userIds});
-      })
-      .then(userToUpdate => {
-        usersForSendNotification = _(userToUpdate).filter(user => user.id !== req.pmSelectedUser.id).value();
+        let userIds = _(userComments).map('user').concat(req.pmLostFound.user).uniqBy().value();
+        userIds = userIds.filter(userId => userId !== req.pmSelectedUser.id);
 
         // TODO: only send new message to receiver using socket
-        const roomName = `lost_found_comment_${req.pmLostFound.id}`;
+        const roomName = `lostFound_comment_${req.pmLostFound.id}`;
         sails.sockets.broadcast(roomName, 'lostFoundComment', comment);
 
-        return Q.all(usersForSendNotification.map(user => {
+        return Q.all(userIds.map(user => {
           return Notification.create({
             from: req.pmSelectedUser.id,
-            to: user.id,
+            to: user,
             lostFoundCommentCreate: {
               lostFound: req.pmLostFound.id,
               comment: comment.id,
@@ -126,9 +123,9 @@ module.exports = {
         notifications.forEach(notification => {
           notification = notification.toJSON();
           notification.from = comment.user;
-          const socketToEmit = _.find(usersForSendNotification, {id: notification.to});
-          if (socketToEmit && socketToEmit.socketId) {
-            sails.sockets.broadcast(socketToEmit.socketId, 'notificationNew', notification);
+          const socketId = UtilService.USER_ID_SOCKET_ID_MAP[notification.to];
+          if (socketId && socketId !== UtilService.USER_ID_SOCKET_ID_MAP[req.pmSelectedUser.id]) {
+            sails.sockets.broadcast(socketId, 'notificationNew', notification);
           }
         });
         res.ok();

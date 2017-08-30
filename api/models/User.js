@@ -32,11 +32,6 @@ module.exports = {
       collection: 'Room',
       via: 'user'
     },
-    // TODO: store into redis
-    socketId: {
-      type: 'string',
-      defaultsTo: null
-    },
     internalUsers: {
       collection: 'User',
       via: 'id'
@@ -46,7 +41,6 @@ module.exports = {
       const obj = this.toObject();
       delete obj.password;
       delete obj.authProviders;
-      delete obj.socketId;
       return obj;
     }
   }

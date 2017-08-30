@@ -21,5 +21,7 @@ module.exports = {
         resolve(result);
       });
     });
-  }
+  },
+
+  USER_ID_SOCKET_ID_MAP: {}
 };

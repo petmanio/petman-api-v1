@@ -11,10 +11,9 @@ module.exports = {
       return res.badRequest();
     }
 
-    req.pmUser.socketId = sails.sockets.getId(req);
-    req.pmUser.save()
-      .then(() => res.ok())
-      .catch(next)
+    // TODO: use redis
+    UtilService.USER_ID_SOCKET_ID_MAP[req.pmSelectedUser.id] = sails.sockets.getId(req);
+    res.ok();
   }
 };
 
