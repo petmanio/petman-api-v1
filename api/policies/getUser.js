@@ -7,13 +7,16 @@
  * @docs        :: http://sailsjs.org/#!/documentation/concepts/Policies
  *
  */
+const _ = require('lodash');
 module.exports = function(req, res, next) {
   let token;
+  let selectedUserId;
   if (req.isSocket) {
     token = req.body['x-auth-token'];
     delete req.body['x-auth-token'];
   } else {
     token = req.header('x-auth-token');
+    selectedUserId = req.header('x-selected-user');
   }
 
   let user;
@@ -22,8 +25,10 @@ module.exports = function(req, res, next) {
     AuthService.getUserByToken(token)
       .then((data) => {
       user = data;
-        if (user) {
-          req.pmUser = user;
+        req.pmUser = user;
+        if (selectedUserId && selectedUserId.match(/internal/)) {
+          const id = parseInt(selectedUserId.replace('internal:', ''), 0);
+          req.pmInternalUser = _.find(req.pmUser.internalUsers, {id});
         }
         next();
       })

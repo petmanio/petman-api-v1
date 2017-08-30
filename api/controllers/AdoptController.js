@@ -22,13 +22,19 @@ module.exports = {
     UtilService.uploadFile(req, 'images', path.join(config.uploadDir, 'images/adopt'))
       .then(images => {
         uploadedImages = images;
-        return Adopt.create({
+        const query = {
           description: req.body.description,
-          user: req.pmUser,
           images: images.map(image => {
             return { src: image.fd.replace(config.uploadDir, '') }
           })
-        });
+        };
+
+        if (req.pmInternalUser) {
+          query.internalUser = req.pmInternalUser;
+        } else {
+          query.user = req.pmUser;
+        }
+        return Adopt.create(query);
       })
       .then(adopt => res.ok(adopt.toJSON()))
       .catch(err => {
@@ -40,8 +46,10 @@ module.exports = {
   getById(req, res, next) {
 	  return Adopt.getAdoptById(req.pmAdopt.id)
       .then(adopt => {
-        if (req.pmUser) {
+        if (req.pmUser && adopt.user) {
           adopt.isOwner = adopt.user.id === req.pmUser.id;
+        } else if (req.pmInternalUser && adopt.internalUser) {
+          adopt.isOwner = adopt.internalUser.id === req.pmInternalUser.id;
         } else {
           adopt.isOwner = false;
         }

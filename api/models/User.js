@@ -32,13 +32,14 @@ module.exports = {
       collection: 'Room',
       via: 'user'
     },
+    // TODO: store into redis
     socketId: {
       type: 'string',
       defaultsTo: null
     },
-    isAdmin: {
-      type: 'boolean',
-      defaultsTo: false
+    internalUsers: {
+      collection: 'InternalUser',
+      via: 'users'
     },
 
     toJSON() {

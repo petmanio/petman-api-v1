@@ -1,10 +1,12 @@
-const Q = require('q');
 /**
  * Adopt.js
  *
  * @description :: TODO: You might write a short summary of how this model works and what it represents here.
  * @docs        :: http://sailsjs.org/documentation/concepts/models-and-orm/models
  */
+const Q = require('q');
+const nestedPop = require('nested-pop');
+
 // TODO: add required options
 // TODO: add pet type
 module.exports = {
@@ -23,8 +25,10 @@ module.exports = {
       via: 'adopt'
     },
     user: {
-      model: 'User',
-      required: true
+      model: 'User'
+    },
+    internalUser: {
+      model: 'InternalUser'
     },
     deletedAt: {
       type: 'datetime',
@@ -41,28 +45,13 @@ module.exports = {
         listCount = count;
         return Adopt.find({deletedAt: null})
           .populate('images')
+          .populate('user')
+          .populate('internalUser')
           .skip(skip)
           .limit(limit)
           .sort({createdAt: 'desc'});
       })
-      .then(list => {
-        const promises = [];
-        list.forEach(adopt => {
-          const deferred = Q.defer();
-          promises.push(deferred.promise);
-          User.findOne({id: adopt.user})
-            .populate('userData')
-            .then(user => {
-              adopt = adopt.toJSON();
-              user = user.toJSON();
-              adopt.user = user;
-              deferred.resolve(adopt);
-            })
-            .catch(deferred.reject);
-        });
-
-        return Q.all(promises);
-      })
+      .then(adopt => nestedPop(adopt, { user: ['userData'] }))
       .then((list) => {
         return {
           count: listCount,
@@ -77,17 +66,9 @@ module.exports = {
 
     return Adopt.findOne({id: adoptId, deletedAt: null})
       .populate('images')
-      .then(data => {
-        adopt = data;
-        return User.findOne({id: adopt.user})
-          .populate('userData')
-      })
-      .then(user => {
-        adopt = adopt.toJSON();
-        user = user.toJSON();
-        adopt.user = user;
-        return adopt;
-      });
+      .populate('user')
+      .populate('internalUser')
+      .then(adopt => nestedPop(adopt, { user: ['userData'] }))
   },
 
   deleteById(roomId) {

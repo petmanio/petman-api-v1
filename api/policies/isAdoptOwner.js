@@ -8,7 +8,8 @@
  *
  */
 module.exports = function(req, res, next) {
-  if (req.pmUser.id === req.pmAdopt.user) {
+  if (req.pmUser.id === req.pmAdopt.user ||
+    req.pmUser.internalUsers.some(user => user.id === req.pmAdopt.internalUser)) {
     return next();
   }
   res.forbidden();

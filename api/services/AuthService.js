@@ -91,6 +91,6 @@ module.exports = {
 
   getUserByToken(token) {
     return this.verifyUserToken(token)
-      .then(({ id }) => User.findOneById(id).populate('userData'));
+      .then(({ id }) => User.findOneById(id).populate('userData').populate('internalUsers'));
   }
 };
