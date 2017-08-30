@@ -38,8 +38,8 @@ module.exports = {
       defaultsTo: null
     },
     internalUsers: {
-      collection: 'InternalUser',
-      via: 'users'
+      collection: 'User',
+      via: 'id'
     },
 
     toJSON() {

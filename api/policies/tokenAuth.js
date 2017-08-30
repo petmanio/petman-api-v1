@@ -26,10 +26,8 @@ module.exports = function(req, res, next) {
         user = data;
         if (user) {
           req.pmUser = user;
-          if (selectedUserId && selectedUserId.match(/internal/)) {
-            const id = parseInt(selectedUserId.replace('internal:', ''), 0);
-            req.pmInternalUser = _.find(req.pmUser.internalUsers, {id});
-          }
+          const pmSelectedUser = _.find(req.pmUser.internalUsers, {id: parseInt(selectedUserId, 0)});
+          req.pmSelectedUser = pmSelectedUser || req.pmUser;
           return next();
         }
         res.unauthorized();

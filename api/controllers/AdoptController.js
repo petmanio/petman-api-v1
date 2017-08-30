@@ -22,19 +22,13 @@ module.exports = {
     UtilService.uploadFile(req, 'images', path.join(config.uploadDir, 'images/adopt'))
       .then(images => {
         uploadedImages = images;
-        const query = {
+        return Adopt.create({
           description: req.body.description,
           images: images.map(image => {
             return { src: image.fd.replace(config.uploadDir, '') }
-          })
-        };
-
-        if (req.pmInternalUser) {
-          query.internalUser = req.pmInternalUser;
-        } else {
-          query.user = req.pmUser;
-        }
-        return Adopt.create(query);
+          }),
+          user: req.pmSelectedUser
+        });
       })
       .then(adopt => res.ok(adopt.toJSON()))
       .catch(err => {
@@ -46,10 +40,8 @@ module.exports = {
   getById(req, res, next) {
 	  return Adopt.getAdoptById(req.pmAdopt.id)
       .then(adopt => {
-        if (req.pmUser && adopt.user) {
-          adopt.isOwner = adopt.user.id === req.pmUser.id;
-        } else if (req.pmInternalUser && adopt.internalUser) {
-          adopt.isOwner = adopt.internalUser.id === req.pmInternalUser.id;
+        if (req.pmUser) {
+          adopt.isOwner = adopt.user.id === req.pmSelectedUser.id;
         } else {
           adopt.isOwner = false;
         }
@@ -85,12 +77,12 @@ module.exports = {
 	  let comment;
 	  let usersForSendNotification;
     AdoptComment.create({
-      user: req.pmUser.id,
+      user: req.pmSelectedUser.id,
       adopt: req.pmAdopt.id,
       comment: req.body.comment
     })
       .then(comment => {
-        return User.findOne({id: req.pmUser.id})
+        return User.findOne({id: req.pmSelectedUser.id})
           .populate('userData')
           .then(user => {
             comment = comment.toJSON();
@@ -104,11 +96,11 @@ module.exports = {
         return AdoptComment.find({ select: ['user'], adopt: req.pmAdopt.id });
       })
       .then(userComments => {
-        const userIds = _(userComments).map('user').concat(req.pmAdopt.user).uniqBy().value();
+        const userIds = _(userComments).map('user').uniqBy().value();
         return User.find({select: ['id', 'socketId'], id: userIds});
       })
       .then(userToUpdate => {
-        usersForSendNotification = _(userToUpdate).filter(user => user.id !== req.pmUser.id).value();
+        usersForSendNotification = _(userToUpdate).filter(user => user.id !== req.pmSelectedUser.id).value();
 
         // TODO: only send new message to receiver using socket
         const roomName = `adopt_comment_${req.pmAdopt.id}`;
@@ -116,7 +108,7 @@ module.exports = {
 
         return Q.all(usersForSendNotification.map(user => {
           return Notification.create({
-            from: req.pmUser.id,
+            from: req.pmSelectedUser.id,
             to: user.id,
             adoptCommentCreate: {
               adopt: req.pmAdopt.id,

@@ -25,7 +25,7 @@ module.exports = {
         return LostFound.create({
           description: req.body.description,
           type: req.body.type,
-          user: req.pmUser,
+          user: req.pmSelectedUser,
           images: images.map(image => {
             return { src: image.fd.replace(config.uploadDir, '') }
           })
@@ -41,8 +41,8 @@ module.exports = {
   getById(req, res, next) {
 	  return LostFound.getLostFoundById(req.pmLostFound.id)
       .then(lostFound => {
-        if (req.pmUser) {
-          lostFound.isOwner = lostFound.user.id === req.pmUser.id;
+        if (req.pmSelectedUser) {
+          lostFound.isOwner = lostFound.user.id === req.pmSelectedUser.id;
         } else {
           lostFound.isOwner = false;
         }
@@ -78,12 +78,12 @@ module.exports = {
 	  let comment;
 	  let usersForSendNotification;
     LostFoundComment.create({
-      user: req.pmUser.id,
+      user: req.pmSelectedUser.id,
       lostFound: req.pmLostFound.id,
       comment: req.body.comment
     })
       .then(comment => {
-        return User.findOne({id: req.pmUser.id})
+        return User.findOne({id: req.pmSelectedUser.id})
           .populate('userData')
           .then(user => {
             comment = comment.toJSON();
@@ -97,11 +97,11 @@ module.exports = {
         return LostFoundComment.find({ select: ['user'], lostFound: req.pmLostFound.id });
       })
       .then(userComments => {
-        const userIds = _(userComments).map('user').concat(req.pmLostFound.user).uniqBy().value();
+        const userIds = _(userComments).map('user').uniqBy().value();
         return User.find({select: ['id', 'socketId'], id: userIds});
       })
       .then(userToUpdate => {
-        usersForSendNotification = _(userToUpdate).filter(user => user.id !== req.pmUser.id).value();
+        usersForSendNotification = _(userToUpdate).filter(user => user.id !== req.pmSelectedUser.id).value();
 
         // TODO: only send new message to receiver using socket
         const roomName = `lost_found_comment_${req.pmLostFound.id}`;
@@ -109,7 +109,7 @@ module.exports = {
 
         return Q.all(usersForSendNotification.map(user => {
           return Notification.create({
-            from: req.pmUser.id,
+            from: req.pmSelectedUser.id,
             to: user.id,
             lostFoundCommentCreate: {
               lostFound: req.pmLostFound.id,

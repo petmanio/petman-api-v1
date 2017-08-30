@@ -25,10 +25,8 @@ module.exports = {
       via: 'adopt'
     },
     user: {
-      model: 'User'
-    },
-    internalUser: {
-      model: 'InternalUser'
+      model: 'User',
+      required: true
     },
     deletedAt: {
       type: 'datetime',
@@ -46,7 +44,6 @@ module.exports = {
         return Adopt.find({deletedAt: null})
           .populate('images')
           .populate('user')
-          .populate('internalUser')
           .skip(skip)
           .limit(limit)
           .sort({createdAt: 'desc'});
@@ -67,7 +64,6 @@ module.exports = {
     return Adopt.findOne({id: adoptId, deletedAt: null})
       .populate('images')
       .populate('user')
-      .populate('internalUser')
       .then(adopt => nestedPop(adopt, { user: ['userData'] }))
   },
 

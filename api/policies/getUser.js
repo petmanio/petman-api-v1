@@ -24,11 +24,12 @@ module.exports = function(req, res, next) {
   if (token) {
     AuthService.getUserByToken(token)
       .then((data) => {
-      user = data;
-        req.pmUser = user;
-        if (selectedUserId && selectedUserId.match(/internal/)) {
-          const id = parseInt(selectedUserId.replace('internal:', ''), 0);
-          req.pmInternalUser = _.find(req.pmUser.internalUsers, {id});
+        user = data;
+        if (user) {
+          req.pmUser = user;
+          const pmSelectedUser = _.find(req.pmUser.internalUsers, {id: parseInt(selectedUserId, 0)});
+          req.pmSelectedUser = pmSelectedUser || req.pmUser;
+          return next();
         }
         next();
       })

@@ -2,6 +2,7 @@ const FB = require('fb');
 const q = require('q');
 const jwt = require('jsonwebtoken');
 const config = sails.config;
+const nestedPop = require('nested-pop');
 
 FB.options({
   appId:          config.fb.appId,
@@ -91,6 +92,9 @@ module.exports = {
 
   getUserByToken(token) {
     return this.verifyUserToken(token)
-      .then(({ id }) => User.findOneById(id).populate('userData').populate('internalUsers'));
+      .then(({ id }) => User.findOneById(id).populate('userData').populate('internalUsers'))
+      .then(user => nestedPop(user, {
+        internalUsers: {as: 'user', populate: ['userData']}
+      }));
   }
 };

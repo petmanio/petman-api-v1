@@ -13,7 +13,7 @@ module.exports = {
       return res.badRequest();
     }
     Message.create({
-      from: req.pmUser.id,
+      from: req.pmSelectedUser.id,
       to: req.pmUserEntity.id,
       text: req.body.text
     })
@@ -29,7 +29,7 @@ module.exports = {
       .then(message => {
         newMessage = message;
         return Notification.create({
-          from: req.pmUser.id,
+          from: req.pmSelectedUser.id,
           to: req.pmUserEntity.id,
           messageCreate: {
             message: newMessage.id
@@ -52,7 +52,7 @@ module.exports = {
       .catch(next);
   },
 	getConversations(req, res, next) {
-	  Message.getConversations(req.pmUser.id)
+	  Message.getConversations(req.pmSelectedUser.id)
       .then(messages => {
         res.ok(messages);
       })
@@ -65,7 +65,7 @@ module.exports = {
       .populate('userData')
       .then(user => {
         userEntity = user;
-        return Message.getConversation(req.pmUser.id, req.pmUserEntity.id);
+        return Message.getConversation(req.pmSelectedUser.id, req.pmUserEntity.id);
       })
       .then(messages => {
         messages.userEntity = userEntity;

@@ -15,9 +15,9 @@ module.exports = {
 	list(req, res, next) {
     Room.getList(req.query.skip, req.query.limit)
       .then(rooms => {
-        if (req.pmUser) {
+        if (req.pmSelectedUser) {
           rooms.list = rooms.list.map(room => {
-            room.isOwner = room.user.id === req.pmUser.id;
+            room.isOwner = room.user.id === req.pmSelectedUser.id;
             return room;
           });
         }
@@ -36,7 +36,7 @@ module.exports = {
           description: req.body.description,
           cost: req.body.cost,
           limit: req.body.limit,
-          user: req.pmUser,
+          user: req.pmSelectedUser,
           images: images.map(image => {
             return { src: image.fd.replace(config.uploadDir, '') }
           })
@@ -71,8 +71,8 @@ module.exports = {
       .then(room => nestedPop(room, { user: ['userData'] }))
       .then(room => {
         room.averageRating = averageRaging;
-        if (req.pmUser) {
-          room.isOwner = room.user.id === req.pmUser.id;
+        if (req.pmSelectedUser) {
+          room.isOwner = room.user.id === req.pmSelectedUser.id;
         }
         res.ok(room.toJSON())
       })
@@ -86,7 +86,7 @@ module.exports = {
   },
 
   getApplicationList(req, res, next) {
-    RoomApplication.getApplicationList(req.pmRoom.id, req.pmUser.id)
+    RoomApplication.getApplicationList(req.pmRoom.id, req.pmSelectedUser.id)
       .then(applications => res.ok(applications))
       .catch(next)
   },
@@ -95,7 +95,7 @@ module.exports = {
 	  let newApplication;
 	  let userToNotify;
 	  RoomApplication.findOrCreate({
-      consumer: req.pmUser.id,
+      consumer: req.pmSelectedUser.id,
       provider: req.pmRoom.user,
       room: req.pmRoom.id,
       status: 'WAITING'
@@ -117,7 +117,7 @@ module.exports = {
       .then(data => {
         userToNotify = data;
         return Notification.create({
-          from: req.pmUser.id,
+          from: req.pmSelectedUser.id,
           to: userToNotify.id,
           roomApplicationCreate: {
             room: newApplication.room,
@@ -151,7 +151,7 @@ module.exports = {
       return res.ok();
     }
 
-    if (req.pmRoomApplication.provider === req.pmUser.id) {
+    if (req.pmRoomApplication.provider === req.pmSelectedUser.id) {
       const availableStatuses = ['CANCELED_BY_PROVIDER', 'FINISHED', 'IN_PROGRESS'];
       statusIsRight = availableStatuses.indexOf(req.body.status) !== -1;
       userToNotifyId = req.pmRoomApplication.consumer;
@@ -175,7 +175,7 @@ module.exports = {
       .then(user => {
         userToNotify = user;
         return Notification.create({
-          from: req.pmUser.id,
+          from: req.pmSelectedUser.id,
           to: userToNotify.id,
           roomApplicationStatusUpdate: {
             room: req.pmRoomApplication.room,
@@ -210,7 +210,7 @@ module.exports = {
     let userToNotify;
 
     // TODO: use policy
-    if (req.pmRoomApplication.consumer !== req.pmUser.id) {
+    if (req.pmRoomApplication.consumer !== req.pmSelectedUser.id) {
       return res.badRequest();
     }
 
@@ -229,7 +229,7 @@ module.exports = {
       .then(user => {
         userToNotify = user;
         return Notification.create({
-          from: req.pmUser.id,
+          from: req.pmSelectedUser.id,
           to: userToNotify.id,
           roomApplicationRate: {
             room: req.pmRoomApplication.room,
