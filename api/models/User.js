@@ -32,16 +32,15 @@ module.exports = {
       collection: 'Room',
       via: 'user'
     },
-    socketId: {
-      type: 'string',
-      defaultsTo: null
+    internalUsers: {
+      collection: 'User',
+      via: 'id'
     },
 
     toJSON() {
       const obj = this.toObject();
       delete obj.password;
       delete obj.authProviders;
-      delete obj.socketId;
       return obj;
     }
   }

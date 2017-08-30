@@ -20,7 +20,7 @@ module.exports = {
   create(req, res, next) {
     Question.create({
       description: req.body.description,
-      user: req.pmUser,
+      user: req.pmSelectedUser,
       images: images.map(image => {
         return { src: image.fd.replace(config.uploadDir, '') }
       })
@@ -32,8 +32,8 @@ module.exports = {
   getById(req, res, next) {
 	  return Question.getQuestionById(req.pmQuestion.id)
       .then(question => {
-        if (req.pmUser) {
-          question.isOwner = question.user.id === req.pmUser.id;
+        if (req.pmSelectedUser) {
+          question.isOwner = question.user.id === req.pmSelectedUser.id;
         } else {
           question.isOwner = false;
         }

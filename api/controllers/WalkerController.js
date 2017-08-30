@@ -121,8 +121,8 @@ module.exports = {
           });
       })
       .then((notification) => {
-        sails.sockets.broadcast(userToNotify.socketId, 'notificationNew', notification);
-        sails.sockets.broadcast(userToNotify.socketId, 'walkerApplicationCreate', newApplication);
+        sails.sockets.broadcast(UtilService.USER_ID_SOCKET_ID_MAP[userToNotify.id], 'notificationNew', notification);
+        sails.sockets.broadcast(UtilService.USER_ID_SOCKET_ID_MAP[userToNotify.id], 'walkerApplicationCreate', newApplication);
         res.json(newApplication);
       })
       .catch(next);
@@ -181,8 +181,8 @@ module.exports = {
           }));
       })
       .then(notification => {
-        sails.sockets.broadcast(userToNotify.socketId, 'notificationNew', notification);
-        sails.sockets.broadcast(userToNotify.socketId, 'walkerApplicationStatusUpdate', {
+        sails.sockets.broadcast(UtilService.USER_ID_SOCKET_ID_MAP[userToNotify.id], 'notificationNew', notification);
+        sails.sockets.broadcast(UtilService.USER_ID_SOCKET_ID_MAP[userToNotify.id], 'walkerApplicationStatusUpdate', {
           walkerId: req.pmWalkerApplication.walker,
           applicationId: req.pmWalkerApplication.id,
           status: req.pmWalkerApplication.status
@@ -235,8 +235,8 @@ module.exports = {
           }));
       })
       .then(notification => {
-        sails.sockets.broadcast(userToNotify.socketId, 'notificationNew', notification);
-        sails.sockets.broadcast(userToNotify.socketId, 'walkerApplicationRate', {
+        sails.sockets.broadcast(UtilService.USER_ID_SOCKET_ID_MAP[userToNotify.id], 'notificationNew', notification);
+        sails.sockets.broadcast(UtilService.USER_ID_SOCKET_ID_MAP[userToNotify.id], 'walkerApplicationRate', {
           walkerId: req.pmWalkerApplication.walker,
           applicationId: req.pmWalkerApplication.id,
           rating: req.pmWalkerApplication.rating,

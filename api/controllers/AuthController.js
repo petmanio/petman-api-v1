@@ -39,7 +39,11 @@ module.exports = {
   },
 
   currentUser(req, res, next) {
-    res.ok(req.pmUser.toJSON());
+    let user = req.pmUser;
+    const internalUsers = user.internalUsers.map(internalUser => internalUser.toJSON());
+    user = user.toJSON();
+    user.internalUsers = internalUsers;
+    res.ok(user);
   }
 };
 

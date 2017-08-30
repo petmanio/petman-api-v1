@@ -9,6 +9,7 @@ const path = require('path');
 const fs = require('fs');
 const _ = require('lodash');
 const Q = require('q');
+const nestedPop = require('nested-pop');
 
 module.exports = {
 	list(req, res, next) {
@@ -24,10 +25,10 @@ module.exports = {
         uploadedImages = images;
         return Adopt.create({
           description: req.body.description,
-          user: req.pmUser,
           images: images.map(image => {
             return { src: image.fd.replace(config.uploadDir, '') }
-          })
+          }),
+          user: req.pmSelectedUser
         });
       })
       .then(adopt => res.ok(adopt.toJSON()))
@@ -40,8 +41,8 @@ module.exports = {
   getById(req, res, next) {
 	  return Adopt.getAdoptById(req.pmAdopt.id)
       .then(adopt => {
-        if (req.pmUser) {
-          adopt.isOwner = adopt.user.id === req.pmUser.id;
+        if (req.pmSelectedUser) {
+          adopt.isOwner = adopt.user.id === req.pmSelectedUser.id;
         } else {
           adopt.isOwner = false;
         }
@@ -75,14 +76,13 @@ module.exports = {
 
   createComment(req, res, next) {
 	  let comment;
-	  let usersForSendNotification;
     AdoptComment.create({
-      user: req.pmUser.id,
+      user: req.pmSelectedUser.id,
       adopt: req.pmAdopt.id,
       comment: req.body.comment
     })
       .then(comment => {
-        return User.findOne({id: req.pmUser.id})
+        return User.findOne({id: req.pmSelectedUser.id})
           .populate('userData')
           .then(user => {
             comment = comment.toJSON();
@@ -96,20 +96,17 @@ module.exports = {
         return AdoptComment.find({ select: ['user'], adopt: req.pmAdopt.id });
       })
       .then(userComments => {
-        const userIds = _(userComments).map('user').concat(req.pmAdopt.user).uniqBy().value();
-        return User.find({select: ['id', 'socketId'], id: userIds});
-      })
-      .then(userToUpdate => {
-        usersForSendNotification = _(userToUpdate).filter(user => user.id !== req.pmUser.id).value();
+        let userIds = _(userComments).map('user').concat(req.pmAdopt.user).uniqBy().value();
+        userIds = userIds.filter(userId => userId !== req.pmSelectedUser.id);
 
         // TODO: only send new message to receiver using socket
         const roomName = `adopt_comment_${req.pmAdopt.id}`;
         sails.sockets.broadcast(roomName, 'adoptComment', comment);
 
-        return Q.all(usersForSendNotification.map(user => {
+        return Q.all(userIds.map(user => {
           return Notification.create({
-            from: req.pmUser.id,
-            to: user.id,
+            from: req.pmSelectedUser.id,
+            to: user,
             adoptCommentCreate: {
               adopt: req.pmAdopt.id,
               comment: comment.id,
@@ -125,9 +122,9 @@ module.exports = {
         notifications.forEach(notification => {
           notification = notification.toJSON();
           notification.from = comment.user;
-          const socketToEmit = _.find(usersForSendNotification, {id: notification.to});
-          if (socketToEmit && socketToEmit.socketId) {
-            sails.sockets.broadcast(socketToEmit.socketId, 'notificationNew', notification);
+          const socketId = UtilService.USER_ID_SOCKET_ID_MAP[notification.to];
+          if (socketId && socketId !== UtilService.USER_ID_SOCKET_ID_MAP[req.pmSelectedUser.id]) {
+            sails.sockets.broadcast(socketId, 'notificationNew', notification);
           }
         });
         res.ok();
