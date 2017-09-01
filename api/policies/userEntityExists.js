@@ -9,7 +9,7 @@
  */
 module.exports = function(req, res, next) {
   const userId = req.param('userEntityId');
-  if (req.pmUser.id.toString() === userId.toString()) {
+  if (req.pmSelectedUser.id.toString() === userId.toString()) {
     return res.badRequest();
   }
   User.findOne({id: userId})

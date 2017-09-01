@@ -15,9 +15,9 @@ module.exports = {
   list(req, res, next) {
     Walker.getList(req.query.skip, req.query.limit)
       .then(walkers => {
-        if (req.pmUser) {
+        if (req.pmSelectedUser) {
           walkers.list = walkers.list.map(walker => {
-            walker.isOwner = walker.user.id === req.pmUser.id;
+            walker.isOwner = walker.user.id === req.pmSelectedUser.id;
             return walker;
           });
         }
@@ -32,7 +32,7 @@ module.exports = {
       description: req.body.description,
       cost: req.body.cost,
       limit: req.body.limit,
-      user: req.pmUser
+      user: req.pmSelectedUser
     })
       .then(walker => {
         return Walker.findOne({id: walker.id})
@@ -58,8 +58,8 @@ module.exports = {
       .then(walker => nestedPop(walker, { user: ['userData'] }))
       .then(walker => {
         walker.averageRating = averageRaging;
-        if (req.pmUser) {
-          walker.isOwner = walker.user.id === req.pmUser.id;
+        if (req.pmSelectedUser) {
+          walker.isOwner = walker.user.id === req.pmSelectedUser.id;
         }
         res.ok(walker.toJSON())
       })
@@ -73,7 +73,7 @@ module.exports = {
   },
 
   getApplicationList(req, res, next) {
-    WalkerApplication.getApplicationList(req.pmWalker.id, req.pmUser.id)
+    WalkerApplication.getApplicationList(req.pmWalker.id, req.pmSelectedUser.id)
       .then(applications => res.ok(applications))
       .catch(next)
   },
@@ -82,7 +82,7 @@ module.exports = {
     let newApplication;
     let userToNotify;
     WalkerApplication.findOrCreate({
-      consumer: req.pmUser.id,
+      consumer: req.pmSelectedUser.id,
       provider: req.pmWalker.user,
       walker: req.pmWalker.id,
       status: 'WAITING'
@@ -104,7 +104,7 @@ module.exports = {
       .then(data => {
         userToNotify = data;
         return Notification.create({
-          from: req.pmUser.id,
+          from: req.pmSelectedUser.id,
           to: userToNotify.id,
           walkerApplicationCreate: {
             walker: newApplication.walker,
@@ -138,7 +138,7 @@ module.exports = {
       return res.ok();
     }
 
-    if (req.pmWalkerApplication.provider === req.pmUser.id) {
+    if (req.pmWalkerApplication.provider === req.pmSelectedUser.id) {
       const availableStatuses = ['CANCELED_BY_PROVIDER', 'FINISHED', 'IN_PROGRESS'];
       statusIsRight = availableStatuses.indexOf(req.body.status) !== -1;
       userToNotifyId = req.pmWalkerApplication.consumer;
@@ -162,7 +162,7 @@ module.exports = {
       .then(user => {
         userToNotify = user;
         return Notification.create({
-          from: req.pmUser.id,
+          from: req.pmSelectedUser.id,
           to: userToNotify.id,
           walkerApplicationStatusUpdate: {
             walker: req.pmWalkerApplication.walker,
@@ -197,7 +197,7 @@ module.exports = {
     let userToNotify;
 
     // TODO: use policy
-    if (req.pmWalkerApplication.consumer !== req.pmUser.id) {
+    if (req.pmWalkerApplication.consumer !== req.pmSelectedUser.id) {
       return res.badRequest();
     }
 
@@ -216,7 +216,7 @@ module.exports = {
       .then(user => {
         userToNotify = user;
         return Notification.create({
-          from: req.pmUser.id,
+          from: req.pmSelectedUser.id,
           to: userToNotify.id,
           walkerApplicationRate: {
             walker: req.pmWalkerApplication.walker,

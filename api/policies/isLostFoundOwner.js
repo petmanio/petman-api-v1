@@ -8,7 +8,7 @@
  *
  */
 module.exports = function(req, res, next) {
-  if (req.pmUser.id === req.pmLostFound.user) {
+  if (req.pmSelectedUser.id === req.pmLostFound.user) {
     return next();
   }
   res.forbidden();

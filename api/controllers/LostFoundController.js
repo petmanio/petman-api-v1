@@ -124,7 +124,7 @@ module.exports = {
           notification = notification.toJSON();
           notification.from = comment.user;
           const socketId = UtilService.USER_ID_SOCKET_ID_MAP[notification.to];
-          if (socketId && socketId !== UtilService.USER_ID_SOCKET_ID_MAP[req.pmSelectedUser.id]) {
+          if (socketId) {
             sails.sockets.broadcast(socketId, 'notificationNew', notification);
           }
         });

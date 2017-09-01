@@ -8,7 +8,7 @@
  *
  */
 module.exports = function(req, res, next) {
-  if (req.pmUser.id === req.pmRoomApplication.provider || req.pmUser.id === req.pmRoomApplication.consumer) {
+  if (req.pmSelectedUser.id === req.pmRoomApplication.provider || req.pmSelectedUser.id === req.pmRoomApplication.consumer) {
     return next();
   }
   res.badRequest();
